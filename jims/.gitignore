@@ -4,7 +4,7 @@
 ### Java ###
 # Compiled class file
 *.class
-
+.svn/
 # Log file
 *.log
 
