@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<!--
+    SQL File Name : FsysAlamDAO.xml
+    Description : 알람 담당
+    Author : jij
+    Since : 2021.04.14
+-->
+
+<mapper namespace="fsysAlamDAO">
+	
+    <!-- @!@ 미승인 장비 반출 알람 등록 -->
+    <insert id="regEvdcWarnAlam" parameterType="java.util.HashMap">
+    	/* regEvdcWarnAlam @!@ 미승인 장비 반출 알람등록 */
+    	<selectKey resultType="java.util.HashMap" keyProperty="vltnSno,vltnDt" order="BEFORE">
+			SELECT NVL(MAX(A.VLTN_SNO), 0) + 1 AS vltnSno, DATE_FORMAT(NOW(), '%Y%m%d') AS vltnDt FROM ALAM A WHERE VLTN_DT = DATE_FORMAT(NOW(), '%Y%m%d')
+        </selectKey>
+    	INSERT INTO ALAM (
+			VLTN_DT
+			,VLTN_SNO
+			,EQP_SNO
+			,VLTN_DIV
+			,CFRM_YN
+			,REG_DT
+			,REGR_ID
+		)
+		VALUES (
+			#{vltnDt}
+			,#{vltnSno}
+			,#{eqpSno}
+			,#{vltnDiv}
+			,'N'
+			,NOW()
+			,'SYSTEM'
+		)
+    </insert>
+    
+    <!-- @!@ 미승인 장비 반출 알람 확인 -->
+	<update id="updEvdcWarnAlamCfrmY" parameterType="java.util.HashMap">
+		/* updEvdcWarnAlamCfrmY @!@ 미승인 장비 반출 알람 확인 */
+		UPDATE
+			ALAM
+		SET
+			CFRM_YN = 'Y'	   	 	
+			, UPD_DT   = NOW()
+			, UPDR_ID  = #{session_userid}
+		WHERE
+			VLTN_DT = #{vltnDt}
+		AND
+			VLTN_SNO = #{vltnSno}
+    </update>
+    
+    <!-- @!@ 미승인 장비 반출 이름 조회 -->
+	<select id="queryEvdcWarnCdNm" parameterType="java.util.HashMap" resultType="egovMap">
+		/* queryEvdcWarnCdNm @!@ 미승인 장비 반출 이름 조회 */
+		SELECT
+			EQP_NM
+			,FN_GET_CODENM(#{vltnDiv}) AS VLTN_DIV_NM
+		FROM
+			EQUIPMENT_MGMT
+		WHERE
+			EQP_SNO = #{eqpSno}
+    </select>
+    
+</mapper>

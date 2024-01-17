@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+						http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.0.xsd">
+
+
+	<!-- 
+		<aop:aspectj-autoproxy proxy-target-class="true"/>
+	 -->
+	 <!-- 
+	<bean id="syslog" class="frame.aop.EgovSysLogAspect" />
+	<aop:config>
+		<aop:aspect id="sysLogAspect" ref="syslog">
+			<aop:around pointcut="execution(public * jims..*Impl.*(..))" method="logSelect" />
+			<aop:around pointcut="execution(public * egovframework..*Impl.InsertLog*(..))" method="logSelect" />
+			<aop:around pointcut="execution(public * frame..*Impl.*(..))" method="logSelect" />
+		</aop:aspect>
+	</aop:config>
+
+			 -->
+	
+	<!--  System Log Aspect -->
+	<bean id="syslog" class="egovframework.com.sym.log.lgm.service.EgovSysLogAspect" />
+
+	<aop:config>
+		<aop:aspect id="sysLogAspect" ref="syslog">
+			<!--  insert로 시작되는 service Method -->
+			<aop:around pointcut="execution(public * jims..impl.*Impl.insert*(..)) or
+								  execution(public * jims..impl.*Impl.proc*(..)) or
+								  execution(public * jims..impl.*Impl.reg*(..)) or
+								  execution(public * frame..impl.*Impl.insert*(..)) or
+								  execution(public * frame..impl.*Impl.reg*(..))" method="logInsert" />
+								  
+			<!--  update로 시작되는 service Method -->
+			<aop:around pointcut="execution(public * jims..impl.*Impl.upd*(..)) or
+								  execution(public * jims..impl.*Impl.mod*(..)) or
+								  execution(public * jims..impl.*Impl.Mod*(..)) or
+								  execution(public * jims..impl.*Impl.req*(..)) or
+								  execution(public * frame..impl.*Impl.upd*(..))" method="logUpdate" />
+								
+			<!--  delete로 시작되는 service Method -->
+			<aop:around pointcut="execution(public * jims..impl.*Impl.del*(..)) or
+								  execution(public * frame..impl.*Impl.del*(..))" method="logDelete" />
+								
+			<!--  select로 시작되는 service Method -->
+			<aop:around pointcut="execution(public * jims..impl.*Impl.select*(..)) or
+								  execution(public * jims..impl.*Impl.index*(..)) or
+								  execution(public * frame..impl.*Impl.select*(..)) or
+								  execution(public * frame..impl.*Impl.query*(..)) or
+								  execution(public * frame..impl.*Impl.action*(..)) or
+								  execution(public * frame..impl.*Impl.check*(..)) or
+								  execution(public * frame..impl.*Impl.get*(..)) or
+								  execution(public * frame..impl.*Impl.myInfo*(..)) or
+								  execution(public * frame..impl.*Impl.userInfo*(..))" method="logSelect" />
+			
+		</aop:aspect>
+	</aop:config>
+	
+	<aop:config>
+		<aop:pointcut id="egov.serviceMethod" expression="execution(* egovframework.com..impl.*Impl.*(..))" />
+
+		<aop:aspect ref="egov.exceptionTransfer">
+			<aop:after-throwing throwing="exception" pointcut-ref="egov.serviceMethod" method="transfer" />
+		</aop:aspect>
+	</aop:config>
+	
+	<bean id="egov.exceptionTransfer" class="egovframework.rte.fdl.cmmn.aspect.ExceptionTransfer">
+		<property name="exceptionHandlerService">
+			<list>
+				<ref bean="defaultExceptionHandleManager" />
+				<ref bean="otherExceptionHandleManager" />
+			</list>
+		</property>
+	</bean>
+
+	<bean id="defaultExceptionHandleManager" class="egovframework.rte.fdl.cmmn.exception.manager.DefaultExceptionHandleManager">
+		<property name="reqExpMatcher">
+			<ref bean="egov.antPathMater"/>
+		</property>
+		<property name="patterns">
+			<list>
+				<value>**service.impl.*</value>
+			</list>
+		</property>
+		<property name="handlers">
+			<list>
+				<ref bean="egovHandler" />
+			</list>
+		</property>
+	</bean>
+
+	<bean id="otherExceptionHandleManager" class="egovframework.rte.fdl.cmmn.exception.manager.DefaultExceptionHandleManager">
+		<property name="reqExpMatcher">
+			<ref bean="egov.antPathMater"/>
+		</property>
+		<property name="patterns">
+			<list>
+				<value>**service.impl.*</value>
+			</list>
+		</property>
+		<property name="handlers">
+			<list>
+				<ref bean="otherHandler" />
+			</list>
+		</property>
+	</bean>
+	
+	<bean id="egovHandler" class="egovframework.com.cmm.EgovComExcepHndlr" />
+	<bean id="otherHandler" class="egovframework.com.cmm.EgovComOthersExcepHndlr" />	
+	
+
+</beans>

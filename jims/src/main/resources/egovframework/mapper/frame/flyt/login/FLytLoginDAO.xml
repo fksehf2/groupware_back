@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<!--
+    SQL File Name : FLytLoginDAO.xml
+    Description : 사용자 로그인을 담당
+    Author : jmkim
+    Since : 2021.04.07
+-->
+
+<mapper namespace="fLytLoginDAO">
+
+
+ 
+	<resultMap id="actlogin" type="frame.flyt.login.service.FLytLoginVO">
+        <result property="userId"            column="USER_ID"             />
+        <result property="regStatus"         column="REG_STATUS"          />
+        <result property="userGb"            column="USER_GB"             />
+        <result property="userNm"            column="USER_NM"             />
+        <result property="telNo"             column="TEL_NO"              />
+        <result property="email"             column="EMAIL"               />
+        <result property="leaveDt"           column="LEAVE_DT"            />
+        <result property="pwdChgDt"          column="PWD_CHG_DT"          />
+        <result property="pwdErrCnt"         column="PWD_ERR_CNT"         />
+        <result property="insttCd"           column="INSTT_CD"            />
+        <result property="insttNm"           column="INSTT_NM"            />
+        <result property="userGbNm"          column="USER_GB_NM"          />
+        <result property="deptNm"            column="DEPT_NM"             />
+        <result property="upInsttCd"         column="UP_INSTT_CD"         />
+    </resultMap>
+ 	
+
+ 	<!-- 아이디 중복 체크 -->
+    <select id="checkId" parameterType="frame.flyt.login.service.FLytLoginVO" resultType="int">
+     /* fLytLoginDAO.actionLogin 사용자 로그인 */		
+           SELECT COUNT(USER_ID) AS RESULT_CNT
+             FROM USER
+            WHERE 1=1
+            AND USE_YN = 'Y'
+			<if test="searchUserId != null">
+			AND USER_ID = #{searchUserId}
+			</if>
+			<if test="sName != null">
+			AND USER_ID = #{sName}
+			</if>
+			<if test="sBirthDateReal != null">
+			AND USER_NM = #{sBirthDateReal}
+			</if>
+            
+    </select>
+ 	 
+    
+    <select id="actionLogin" parameterType="frame.flyt.login.service.FLytLoginVO"  resultMap="actlogin">
+		   /* fLytLoginDAO.actionLogin 사용자 로그인 */		   
+			SELECT USER_ID
+			      ,REG_STATUS
+			      ,USER_GB /* C01001:급식기관, C01002:영양사, C01003:업체회원, C01004:유관기관, C01009:농식품부, C01999:관리자 */
+			      ,FN_GET_CODENM(USER_GB) AS USER_GB_NM
+			      ,USER_NM
+			      ,TEL_NO
+			      ,EMAIL
+			      ,LEAVE_DT
+			      ,PWD_CHG_DT
+			      ,PWD_ERR_CNT
+			      ,INSTT_CD
+			      ,(SELECT INSTT_NM FROM INSTT I WHERE I.INSTT_CD = U.INSTT_CD AND I.USE_YN = 'Y') AS INSTT_NM
+			      ,(SELECT UP_INSTT_CD FROM INSTT I WHERE I.INSTT_CD = U.INSTT_CD AND I.USE_YN = 'Y') AS UP_INSTT_CD
+			      ,(SELECT CONCAT(I.DEPT_NM, ' ', I.TEAM_NM ) FROM INSTT I WHERE I.INSTT_CD = U.INSTT_CD AND I.USE_YN = 'Y') AS DEPT_NM
+  				  ,HP_TEL_NO
+			  FROM USER U
+			 WHERE USER_ID   = #{userId}
+		       AND PWD           = #{pwd}
+		       AND USE_YN        = 'Y'    
+	</select>
+    
+    
+   <select id="actionAdminLogin" parameterType="frame.flyt.login.service.FLytLoginVO"  resultMap="actlogin">
+        /* fLytLoginDAO.actionAdminLogin 관리자 로그인 */
+        <![CDATA[
+            SELECT 
+            	  a.USER_ID
+			      , a.REG_STATUS
+			      , a.USER_GB /* C01001:급식기관, C01002:영양사, C01003:업체회원, C01004:유관기관, C01009:농식품부, C01999:관리자 */
+			      , FN_GET_CODENM(a.USER_GB) AS USER_GB_NM
+			      , a.USER_NM
+			      , a.TEL_NO
+			      , a.EMAIL
+			      , a.LEAVE_DT
+			      , a.PWD_CHG_DT
+			      , a.PWD_ERR_CNT
+			      , (CASE WHEN a.INSTT_CD IS NULL THEN 			      
+												      (CASE WHEN (SELECT c.INSTT_CD FROM (SELECT b.INSTT_CD 
+												                                            FROM DEPT_USER b 
+												                                           WHERE b.USER_ID = #{userId} 
+												                                             AND b.USE_YN = 'Y' 
+												                                             AND b.IOFIC_STAT_CD = 'C13002' 
+												                                           ORDER BY b.UPD_DT DESC) c 
+												                                           LIMIT 1) IS NULL 
+												      		THEN (SELECT b.INSTT_CD 
+														            FROM DEPT_USER b, INSTT c 
+														           WHERE b.USER_ID = #{userId}
+														             AND b.INSTT_CD = c.INSTT_CD 
+														             AND b.USE_YN ='Y' AND c.USE_YN ='Y'
+														             )
+												            ELSE (SELECT c.INSTT_CD FROM (SELECT b.INSTT_CD 
+												                                            FROM DEPT_USER b 
+												                                           WHERE b.USER_ID = #{userId}
+												                                             AND b.USE_YN  = 'Y' 
+												                                             AND b.IOFIC_STAT_CD = 'C13002' 
+												                                             ORDER BY b.UPD_DT DESC) c LIMIT 1)
+												       END)			      		
+					     ELSE a.INSTT_CD 
+			       END) AS INSTT_CD
+			       ,(SELECT INSTT_NM FROM INSTT I WHERE I.INSTT_CD = a.INSTT_CD AND I.USE_YN = 'Y') AS INSTT_NM
+			      ,(SELECT UP_INSTT_CD FROM INSTT I WHERE I.INSTT_CD = a.INSTT_CD AND I.USE_YN = 'Y') AS UP_INSTT_CD
+			      ,(SELECT CONCAT(I.DEPT_NM, ' ', I.TEAM_NM ) FROM INSTT I WHERE I.INSTT_CD = a.INSTT_CD AND I.USE_YN = 'Y') AS DEPT_NM
+			      ,a.HP_TEL_NO
+              FROM USER a
+             WHERE a.USER_ID   = #{userId}
+               AND a.USE_YN    = 'Y'
+               AND a.PWD       = #{pwd}
+        ]]>                
+    </select>
+ 	
+ 		<!-- 접속이력 등록 -->
+ 	<insert id="insertConctHist" parameterType="java.util.Map">
+ 		/* fLytLoginDAO.insertConctHist 접속이력 저장 */
+        INSERT INTO CM_CONCT_HIST (
+		                                    ID
+		                                  , CONCT_IP
+		                                  , LOG_OUT_HOUR
+		                                  , SESS_ID
+		                                  , REG_DT
+		                                  , UPMU_GB
+		                                  ) 
+		                           VALUES (
+		                                    ${userId}
+		                                  , ${conctIp}
+		                                  , null
+		                                  , ${sessId}
+		                                  , SYSDATE
+		                                  , ${upmuGb}
+		                                  )
+	</insert>
+	
+	
+	<!-- 비밀번호 변경주기 조회 -->
+	<select id="checkPwdChng" parameterType="frame.flyt.login.service.FLytLoginVO" resultType="java.lang.String">
+	<![CDATA[
+	/* fLytLoginDAO.checkPwdChng 비밀번호 변경주기 조회 */
+	SELECT 
+		CASE WHEN IF( PWD_CHG_DT IS NULL,DATEDIFF(NOW(),REG_DT),DATEDIFF(NOW(),DATE_FORMAT(PWD_CHG_DT, '%Y%m%d'))) >= 90 
+		THEN 'OVER' 
+		ELSE 'NONE' 
+		END AS PWD_CHG
+	FROM USER
+	WHERE 1=1
+		AND USER_ID = #{userId}
+		AND USE_YN = 'Y'
+	]]>
+	</select>
+	
+	    <!-- 아이디 찾기 -->
+    <select id="findIDFLytLoginFindIDPDtlPop" parameterType="java.util.HashMap" resultType="egovMap">
+		/* fLytLoginDAO.findIDFLytLoginFindIDPDtlPop 아이디 찾기 */
+		SELECT 
+			CONCAT(SUBSTR(USER_ID, 1, LENGTH(USER_ID) - 3 ) , '***') AS USER_ID
+		FROM USER
+		WHERE USE_YN = 'Y' 
+		  AND USER_NM = #{userNm}
+		  AND PWD_FIND_QUES = #{pwdFindQues}
+		  AND PWD_FIND_ASW = #{pwdFindAsw}
+    </select>
+    
+    
+    <!-- 비밀번호 찾기(인증) -->
+    <select id="findPWFLytLoginFindPWPDtlPop" parameterType="java.util.HashMap"  resultType="java.lang.Integer">
+		/* fLytLoginDAO.findPWFLytLoginFindPWPDtlPop 비밀번호 찾기(인증) */
+		SELECT 
+			COUNT(USER_ID) AS RESULT_CNT
+		FROM USER
+		WHERE USE_YN = 'Y'
+		  AND USER_ID = #{userId} 
+		  AND USER_NM = #{userNm}
+		  AND PWD_FIND_QUES = #{pwdFindQues}
+		  AND PWD_FIND_ASW = #{pwdFindAsw}
+    </select>
+    
+        <!-- 비밀번호 변경 -->
+    <update id="chgPWFLytLoginFindPWPDtlPop"  parameterType="java.util.HashMap">
+       /* fLytLoginDAO.chgPWFLytLoginFindPWPDtlPop*/
+	    UPDATE USER
+	       SET PWD = #{pwd}
+	    	 , PWD_CHG_DT = DATE_FORMAT(NOW(), '%Y%m%d') 
+	    	 , PWD_ERR_CNT = 0
+	    	 , UPDR_ID = #{userId}
+	    	 , UPD_DT   = NOW()
+	    WHERE USE_YN = 'Y'
+	      AND USER_ID = #{userId}
+    </update>
+    
+ 	    <!-- 비밀번호 변경횟수 초기화 -->
+    <update id="lckCncFLytLoginFindPWPDtlPop"  parameterType="java.util.HashMap">
+       /* fLytLoginDAO.lckCncFLytLoginFindPWPDtlPop*/
+	    UPDATE USER
+	       SET PWD_ERR_CNT = 0    	 
+	    	 , UPDR_ID = #{userId}
+	    	 , UPD_DT   = NOW()
+	    WHERE USE_YN = 'Y'
+	      AND USER_ID = #{userId}
+    </update>   
+    
+    <!-- 비밀번호 초기화후 변경 체크 -->
+	<select id="checkPwdClear" parameterType="java.util.Map" resultType="java.lang.String">
+		/* fLytLoginDAO.checkPwdClear 비밀번호 초기화후 변경 체크 */
+		SELECT 
+	 		CASE WHEN PWD= '6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b' THEN 'NOCLEAR' ELSE 'CLEAR' END AS PWD_CLR
+		FROM USER
+		WHERE 1=1
+			AND USER_ID = #{userId}#
+			AND USE_YN = 'Y'
+	</select>
+ 
+ 
+
+ 	
+</mapper>
