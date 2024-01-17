@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<!--
+    SQL File Name : FsysCodeDAO.xml
+    Description : 코드 관리 담당
+    Author : jij
+    Since : 2021.04.14
+-->
+
+<mapper namespace="fsysCodeDAO">
+	
+	<!-- @!@ 그룹 코드 리스트 조회 WHERE 조건 -->
+	<sql id="CodeList">
+           <if test="srcCdIdNm != null and srcCdIdNm != ''">
+               AND CD_ID_NM LIKE CONCAT('%', #{srcCdIdNm}, '%')
+           </if>
+           <if test="srcUseYn != null and srcUseYn != ''">
+               AND USE_YN      = #{srcUseYn}   
+           </if>
+    </sql>
+    
+    <!-- @!@ 상세 코드 리스트 조회 WHERE 조건 -->
+    <sql id="CodeDtlList">
+    					
+    					AND A.CD_ID      = #{srcCdId}
+    </sql>
+	
+	<!-- @!@ 그룹 코드 리스트 토탈 카운트 -->
+    <select id="queryFsysCodeMListTotCnt" parameterType="java.util.HashMap" resultType="int">
+    	/* queryFsysCodeMListTotCnt @!@ 그룹 코드 리스트 토탈 카운트 */
+		SELECT 
+			COUNT(*) AS TOT_CNT
+		FROM
+			CODE
+		WHERE
+			1 = 1
+			<include refid="CodeList"/>
+    </select>
+	
+	<!-- @!@ 그룹 코드 리스트 -->
+    <select id="queryFsysCodeMList" parameterType="java.util.HashMap" resultType="egovMap">
+    	/* queryFsysCodeMList @!@ 그룹 코드 리스트*/
+		SELECT 
+			CD_ID
+			,CD_ID_NM
+			,CD_ID_EXPL
+			,USE_YN
+			,CASE WHEN USE_YN = 'Y' THEN '사용' ELSE '미사용' END USE_YN_NM
+		FROM
+			CODE
+		WHERE
+			1 = 1
+			<include refid="CodeList"/>
+		ORDER BY
+			CD_ID
+		LIMIT
+			#{pageStart}, #{perPageNum}
+    </select>
+    
+    <!-- @!@ 상세 코드 리스트 토탈 카운트 -->
+    <select id="queryFsysCodeDtlMListTotCnt" parameterType="java.util.HashMap" resultType="int">
+    	/* queryFsysCodeDtlMListTotCnt @!@ 상세 코드 리스트 토탈 카운트 */
+		SELECT
+    		COUNT(*) AS TOT_CNT
+		FROM 
+			CODE_DTL A RIGHT OUTER JOIN CODE B ON A.CD_ID = B.CD_ID
+		WHERE 1 = 1
+			<include refid="CodeDtlList"/>
+    </select>
+    
+    <!-- @!@ 상세 코드 리스트 -->
+    <select id="queryFsysCodeDtlMList" parameterType="java.util.HashMap" resultType="egovMap">
+    	/* queryFsysCodeDtlMList @!@ 상세 코드 리스트 */
+    	SELECT
+    		A.CD
+			, A.CD_ID
+			, A.CD_NM
+			, A.CD_EXPL
+			, A.SORT_ORD
+			, A.USE_YN
+			, CASE WHEN A.USE_YN = 'Y' THEN '사용' ELSE '미사용' END USE_YN_NM
+		FROM 
+			CODE_DTL A RIGHT OUTER JOIN CODE B ON A.CD_ID = B.CD_ID
+		WHERE 1 = 1
+			<include refid="CodeDtlList"/>
+		ORDER BY
+			CD
+		LIMIT
+			#{pageStart}, #{perPageNum}
+    </select>
+    
+    <!-- @!@ 그룹 코드 상세 조회 -->
+    <select id="queryFsysCodeMDtl" parameterType="java.util.HashMap" resultType="egovMap">
+    	/* queryFsysCodeMDtl @!@ 그룹 코드 상세 조회 */
+	    SELECT 
+			CD_ID
+			,CD_ID_NM
+			,CD_ID_EXPL
+			,USE_YN
+	    FROM
+			CODE
+	    WHERE
+	    	CD_ID = #{srcCdId}
+    </select>
+    
+    <!-- @!@ 그룹 코드 등록 -->
+    <insert id="regFsysCodeRDtl" parameterType="java.util.HashMap">
+    	/* regFsysCodeRDtl @!@ 그룹 코드 등록 */
+    	INSERT INTO CODE (
+			CD_ID
+			, CD_ID_NM
+			, CD_ID_EXPL
+			, USE_YN
+			, REG_DT
+			, REGR_ID
+		)
+		VALUES (
+			(SELECT CONCAT(SUBSTR(MAX(A.CD_ID), 1, 1), (SUBSTR(MAX(A.CD_ID), 2, 2) + 1)) AS MAX_CD_ID FROM CODE A)
+			, #{cdIdNm}
+			, #{cdIdExpl}
+			, #{useYn}
+			, NOW()
+			, #{session_userid}
+		)
+    </insert>
+    
+    <!-- @!@ 그룹 코드 수정 -->
+    <update id="updFsysCodeUDtl">
+		/* updFsysCodeUDtl @!@ 그룹 코드 수정 */
+		UPDATE
+			CODE
+		SET
+			CD_ID_NM      = #{cdIdNm}
+			, CD_ID_EXPL  = #{cdIdExpl}
+			, USE_YN      = #{useYn}
+			, UPD_DT      = NOW()
+			, UPDR_ID     = #{session_userid}
+		WHERE
+			CD_ID = #{srcCdId}
+    </update>
+    
+    <!-- @!@ 그룹 코드 삭제 -->
+    <update id="delFsysCodeUDtl" parameterType="java.util.HashMap">
+    	/* delFsysCodeUDtl @!@ 그룹 코드 삭제 */
+        UPDATE
+        	CODE
+        SET
+        	USE_YN = 'N'
+        	, UPD_DT      = NOW()
+			, UPDR_ID     = #{session_userid}
+        WHERE
+        	CD_ID = #{srcCdId}
+    </update>
+    
+    <!-- @!@ 상세 코드 상세 조회 -->
+    <select id="queryFsysCodeDtlMDtl" parameterType="java.util.HashMap" resultType="egovMap">
+    	/* queryFsysCodeDtlMDtl @!@ 상세 코드 상세 조회 */
+    	SELECT
+    		A.CD
+			, A.CD_ID
+			, A.CD_NM
+			, A.CD_EXPL
+			, A.SORT_ORD
+			, A.USE_YN
+		FROM
+			CODE_DTL A
+		WHERE
+			A.CD = #{srcCd} 
+    </select>
+    
+    <!-- @!@ 상세 코드 등록 -->
+    <insert id="regFsysCodeDtlRDtl" parameterType="java.util.HashMap">
+    	/* regFsysCodeDtlRDtl @!@ 상세 코드 등록 */
+    	<selectKey resultType="String" keyProperty="cd" order="BEFORE">
+			SELECT CONCAT(#{cdId}, LPAD(NVL(SUBSTR(MAX(A.CD), 4, 3), '0') + 1, 3, '0')) AS MAX_CD_ID FROM CODE_DTL A WHERE A.CD_ID = #{cdId} AND A.CD != 'C01999'
+    	</selectKey>
+    	INSERT INTO CODE_DTL (
+			CD_ID
+			, CD 
+			, CD_NM
+			, CD_EXPL
+			, SORT_ORD
+			, USE_YN
+			, REG_DT
+			, REGR_ID
+		)
+		VALUES (
+			#{cdId}
+            <!-- , (SELECT CONCAT(#{cdId}, LPAD(NVL(SUBSTR(MAX(A.CD), 4, 3), '0') + 1, 3, '0')) AS MAX_CD_ID FROM CODE_DTL A WHERE A.CD_ID = #{cdId}) -->
+            , #{cd}
+            , #{cdNm}
+            , #{cdExpl}
+            <choose>
+            	<when test="sortOrd neq null and sortOrd neq ''">
+            		, #{sortOrd}
+            	</when>
+            	<otherwise>
+            		, (SELECT NVL(MAX(A.SORT_ORD), 0) + 1 FROM CODE_DTL A WHERE A.CD_ID = #{cdId})
+            	</otherwise>
+            </choose>
+            , #{useYn}
+            , NOW()
+            , #{session_userid}
+		)
+    </insert>
+    
+    <!-- @!@ 상세 코드 수정 -->
+    <update id="updFsysCodeDtlUDtl">
+		/* updFsysCodeDtlUDtl @!@ 상세 코드 수정 */
+		UPDATE
+			CODE_DTL
+		SET
+			CD_NM         = #{cdNm}
+			, CD_EXPL     = #{cdExpl}
+			<choose>
+            	<when test="sortOrd neq null and sortOrd neq ''">
+            		, SORT_ORD    = #{sortOrd}
+            	</when>
+            	<otherwise>
+            		, SORT_ORD = (SELECT NVL(MAX(A.SORT_ORD), 0) + 1 FROM CODE_DTL A WHERE A.CD_ID = #{srcCdId})
+            	</otherwise>
+            </choose>
+			, USE_YN      = #{useYn}
+			, UPD_DT      = NOW()
+			, UPDR_ID     = #{session_userid}
+		WHERE
+			CD_ID = #{srcCdId}
+			AND CD = #{srcCd}
+    </update>
+    
+    <!-- @!@ 상세 코드 삭제 -->
+    <update id="delFsysCodeDtlUDtl" parameterType="java.util.HashMap">
+    	/* delFsysCodeDtlUDtl @!@ 상세 코드 삭제 */
+        UPDATE
+        	CODE_DTL
+        SET
+        	USE_YN = 'N'
+        	, UPD_DT      = NOW()
+			, UPDR_ID     = #{session_userid}
+        WHERE
+        	CD_ID = #{srcCdId}
+        	AND CD = #{srcCd}
+    </update>
+    
+</mapper>

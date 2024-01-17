@@ -1,0 +1,367 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="fsysUserDAO">
+
+
+ 
+	<resultMap id="actlogin" type="frame.flyt.login.service.FLytLoginVO">
+        <result property="userId"            column="USER_ID"             />
+        <result property="regStatus"         column="REG_STATUS"          />
+        <result property="userGb"            column="USER_GB"             />
+        <result property="userNm"            column="USER_NM"             />
+        <result property="telNo"             column="TEL_NO"              />
+        <result property="email"             column="EMAIL"               />
+        <result property="leaveDt"           column="LEAVE_DT"            />
+        <result property="pwdChgDt"          column="PWD_CHG_DT"          />
+        <result property="pwdErrCnt"         column="PWD_ERR_CNT"         />
+        <result property="insttCd"           column="INSTT_CD"            />
+        <result property="policyAgmtYn"      column="POLICY_AGMT_YN"      />
+        <result property="userGbNm"          column="USER_GB_NM"          />
+    </resultMap>
+ 	
+
+ 	    <!-- 비밀번호 오류 회수 조회 -->
+    <select id="getPwdErrCnt" parameterType="frame.flyt.login.service.FLytLoginVO" resultType="int">
+        /* adminUserDAO.getPwdErrCnt 비밀번호 오류 회수 조회 */
+    <![CDATA[
+        SELECT NVL(PWD_ERR_CNT,0)
+        FROM USER
+        WHERE USER_ID = #{userId}
+    ]]>
+    </select>
+    
+        <!-- 비밀번호 오류 증가 2016.02.22 by 최진형 -->
+    <update id="updatePwdErrCnt" parameterType="frame.flyt.login.service.FLytLoginVO">
+        /* adminUserDAO.updatePwdErrCnt 비밀번호 오류 증가 */
+        UPDATE USER
+        SET PWD_ERR_CNT = #{pwdErrCnt}
+        WHERE USER_ID = #{userId}
+    </update>
+    
+    
+    <resultMap id="userNm" type="frame.fbbs.ntc.service.FBbsNtcVO">
+        <result property="regrId" column="REGR_ID"/>
+    </resultMap>
+
+    <sql id="WuserList">
+         <if test="schUserId != null and schUserId != '' ">
+             AND A.USER_ID LIKE  CONCAT('%' , #{schUserId} , '%')
+         </if>
+         <if test="schUserNm != null and schUserNm != '' ">
+             AND A.USER_NM LIKE  CONCAT('%' , #{schUserNm} , '%')
+         </if>
+         <if test="schUserGb != null and schUserGb != '' ">
+             AND A.USER_GB = #{schUserGb}  
+         </if>
+         <if test="schRegStatus != null and schRegStatus != '' ">
+             AND A.REG_STATUS = #{schRegStatus}  
+         </if>
+         <if test="schUserId != null and schUserId != '' ">
+             AND A.USER_ID LIKE  CONCAT('%' , #{schUserId} , '%')
+         </if>
+         <if test="schUseYn != null and schUseYn != '' ">
+             AND A.USE_YN = #{schUseYn}
+         </if>
+         <if test="schInsttNm != null and schInsttNm != '' ">
+         	 AND EXISTS (
+			  				SELECT TB.INSTT_CD
+			  				  FROM INSTT TB
+			  				 WHERE TB.INSTT_CD = A.INSTT_CD 
+			  				   AND (TB.INSTT_NM LIKE CONCAT('%' , #{schInsttNm} , '%') OR TB.DEPT_NM LIKE CONCAT('%' , #{schInsttNm} , '%') OR TB.TEAM_NM LIKE CONCAT('%' , #{schInsttNm} , '%'))
+			  			 )
+         </if>
+            AND A.USER_GB <![CDATA[<>]]> 'C01999'
+    </sql>
+    
+ 	<!-- BOARD 목록 -->
+     <select id="sysUserSelList" parameterType="java.util.HashMap" resultType="egovMap">
+        /* fsysUserDAO.sysUserSelList */
+        
+            SELECT *
+              FROM (
+              			SELECT  A.USER_ID 
+						      , A.USER_NM
+						      , A.USER_GB
+						      , IFNULL( A.TEL_NO,'') AS TEL_NO
+						      , IFNULL(A.HP_TEL_NO,'') AS HP_TEL_NO
+						      , IFNULL(A.EMAIL,'') AS EMAIL
+						      , A.REG_DT
+						      , DATE_FORMAT(A.REG_DT, '%Y-%m-%d') AS DISP_REG_DT
+						      , A.PWD_CHG_DT
+						      , IFNULL(DATE_FORMAT(A.PWD_CHG_DT, '%Y-%m-%d'),'') AS DISP_PWD_CHG_DT
+						      , IFNULL(A.PWD_ERR_CNT,0) AS PWD_ERR_CNT
+						      , A.REG_STATUS
+						      , CASE WHEN A.REG_STATUS = 'Y' THEN '승인' ELSE '미승인' END AS REG_STATUS_NM
+						      , A.INSTT_CD 
+						      , (SELECT CONCAT(DI.DEPT_NM,' ',DI.TEAM_NM) FROM INSTT DI WHERE DI.INSTT_CD = A.INSTT_CD) AS INSTT_CD_NM
+						      , A.USE_YN 
+						      , CASE WHEN A.USE_YN = 'Y' THEN '사용' ELSE '미사용' END AS USE_YN_NM 
+						      , @ROWNUM := @ROWNUM + 1 AS RNUM   
+						 FROM USER A,
+						      (SELECT @ROWNUM := 0) R  
+						WHERE 1=1
+					  <include refid="WuserList"/>
+              		)A
+            ORDER BY A.REG_DT DESC  		
+            LIMIT #{pageStart}, #{perPageNum}
+
+    </select>
+
+    <select id="sysUserSelListTotCnt" parameterType="java.util.HashMap" resultType="int">
+        /* fsysUserDAO.sysUserSelListTotCnt */
+        
+        SELECT COUNT(DISTINCT A.USER_ID) AS TOTCNT
+          FROM USER A
+         WHERE 1=1
+        <include refid="WuserList"/> 
+         
+    </select>
+    
+    <!-- 메뉴등록 -->
+    <insert id="regFsysUserRDtl" parameterType="java.util.HashMap">
+    	/* regFsysUserRDtl */
+    	
+    	INSERT INTO USER (
+    							   USER_ID
+    							 , REG_STATUS
+    							 , USER_GB
+    							 , PWD
+    							 , USER_NM
+    							 , TEL_NO
+    							 , HP_TEL_NO
+    							 , EMAIL
+<!--     							 , LEAVE_DT -->
+<!--     							 , PWD_CHG_DT -->
+<!--     							 , PWD_ERR_CNT -->
+    							 , PWD_FIND_QUES
+    							 , PWD_FIND_ASW
+    							 , INSTT_CD
+    							 , USE_YN
+    							 , REG_DT
+    							 , REGR_ID
+    							 , UPD_DT
+    							 , UPDR_ID
+    						  )
+					   VALUES (
+					                #{userId}
+					              , #{regStatus}
+					              , #{userGb}
+					              , #{pwd}
+					              , #{userNm}
+					              , #{telNo}
+					              , #{hpTelNo}
+					              , #{email}
+<!-- 					              , NULL -->
+<!-- 					              , NULL -->
+<!-- 					              , NULL -->
+					              , #{pwdFindQues}
+					              , #{pwdFindAsw}
+					              , #{insttCd}
+					              , 'Y'
+					              , now()
+					              , #{regrId}
+					              , now()
+					              , #{regrId}
+					          );
+		
+    </insert>
+ 	
+ 	<!-- 아이디 중복 체크 -->
+    <select id="sysUserCheckId" parameterType="java.util.HashMap" resultType="egovMap">
+           SELECT COUNT(A.USER_ID) AS RESULT_CNT 
+			 FROM USER A
+			WHERE A.USER_ID = #{userId}
+    </select>
+    
+    <!-- 사용자 상세 정보 조회 -->
+    <select id="queryFsysUserUDtl" parameterType="java.util.HashMap" resultType="egovMap">
+    	/* queryFsysUserUDtl 사용자 상세 정보 조회 */
+		SELECT  A.USER_ID 
+		      , A.USER_NM
+		      , A.USER_GB
+		      , FN_GET_CODENM(A.USER_GB) AS USER_GB_NM
+		      , A.INSTT_CD
+		      , (SELECT CONCAT(DI.DEPT_NM,' ',DI.TEAM_NM) FROM INSTT DI WHERE DI.INSTT_CD = A.INSTT_CD) AS INSTT_CD_NM 
+		      , A.TEL_NO
+		      , A.HP_TEL_NO
+		      , A.EMAIL
+		      , A.REG_DT
+		      , DATE_FORMAT(A.REG_DT, '%Y-%m-%d') AS DISP_REG_DT
+		      , A.PWD_CHG_DT
+		      , DATE_FORMAT(A.PWD_CHG_DT, '%Y-%m-%d') AS DISP_PWD_CHG_DT
+		      , A.PWD_ERR_CNT
+		      , A.REG_STATUS
+		      , A.PWD_FIND_QUES
+		      , A.PWD_FIND_ASW
+		      , A.USE_YN 
+			  , CASE WHEN A.USE_YN = 'Y' THEN '사용' ELSE '미사용' END AS USE_YN_NM      
+		 FROM USER A
+		WHERE 1=1
+		  AND A.USER_ID = #{userId}
+			
+    </select>
+    
+    <update id="updFsysUserUDtl" parameterType="java.util.HashMap">
+		/* updFsysUserUDtl 사용자 정보 수정 */
+        UPDATE USER
+           SET EMAIL           = #{email}
+             <if test="userId != null and userId != '' ">
+             , USER_NM         = #{userNm}    /* 관리자가 회원수정시 이름까지 가능*/
+             </if>
+             , TEL_NO          = #{telNo}
+             , HP_TEL_NO       = #{hpTelNo}
+             , UPDR_ID         = #{userId}
+             , UPD_DT          = NOW()
+             , PWD_FIND_QUES   = #{pwdFindQues}
+             , PWD_FIND_ASW    = #{pwdFindAsw}
+             , REG_STATUS = #{regStatus}
+             , USE_YN          = #{useYn}
+            <if test="pwd != null and pwd != '' ">
+             , PWD             = #{pwd}
+             , PWD_CHG_DT      = DATE_FORMAT(DATE_ADD(DATE_FORMAT(NOW(), '%Y%m%d'),INTERVAL -100 DAY),'%Y%m%d') /* 관리자가 비번초기화시 세팅*/
+            </if> 
+<!--             <if test='userGb.equals("C01003")'> -->
+<!--              , BIZ_NO          = #{userId} -->
+<!--              , CORP_REG_NO     = #{userId} -->
+<!--              , WORK_PLC_ADDR   = #{userId} -->
+<!--             </if> -->
+         WHERE USER_ID = #{userId}
+    </update>
+    
+    <!-- 사용자 삭제   -->
+    <delete id="delFsysUserUDtl" parameterType="java.util.HashMap">
+    	/* delFsysUserUDtl 사용자 삭제 */
+    	
+        DELETE FROM USER
+        WHERE 1 = 1
+          AND USER_ID = #{userId}
+        
+    </delete>
+    
+    <!-- 부서별 사용자 삭제   -->
+    <delete id="delFsysDeptUserRDtl" parameterType="java.util.HashMap">
+    	/* delFsysDeptUserRDtl 부서별 사용자 삭제 */
+    	
+        DELETE FROM DEPT_USER
+        WHERE 1 = 1
+          AND INSTT_CD = #{insttCd}
+          AND USER_ID = #{userId}
+        
+    </delete>
+    
+    <!-- 부서별 사용자 등록 -->
+    <insert id="regFsysDeptUserRDtl" parameterType="java.util.HashMap">
+    	/* regFsysUserRDtl */
+    	
+    	INSERT INTO DEPT_USER (
+    							   		  INSTT_CD
+										, USER_ID 
+										, USE_YN
+										, REG_DT
+										, REGR_ID
+										, UPD_DT
+										, UPDR_ID
+    						  	   )
+						   VALUES (
+						                #{insttCd}
+						              , #{userId}
+						              , 'Y'
+						              , now()
+						              , #{regrId}
+						              , now()
+						              , #{regrId}
+						          );
+    </insert>
+    
+    <resultMap type="frame.fsys.user.service.FsysUserVO" id="userInfoList">
+        <result property="userGb" column ="USER_GB" />
+        <result property="userGbNm" column ="USER_GB_NM" />
+        <result property="userId" column ="USER_ID" />
+        <result property="pwd" column ="PWD" />
+        <result property="userNm" column ="USER_NM" />
+        <result property="email" column ="EMAIL" />
+        <result property="telNo" column ="TEL_NO" />
+        <result property="pwdFindQues" column ="PWD_FIND_QUES" />
+        <result property="pwdFindAsw" column ="PWD_FIND_ASW" />
+    </resultMap>
+
+    <select id="userInfoList" parameterType="java.lang.String" resultType="egovMap">
+    /* adminUserDAO.userInfoList */
+    <![CDATA[
+          SELECT TA.USER_GB
+               , FN_GET_CODENM(TA.USER_GB) AS USER_GB_NM
+               , TA.USER_ID
+               , '' PWD
+               , TA.USER_NM
+               , TA.EMAIL
+               , TA.TEL_NO
+               , TA.PWD_FIND_QUES
+               , TA.PWD_FIND_ASW
+            FROM USER TA
+           WHERE TA.USER_ID = #{userId}
+     ]]>
+    </select>
+ 	
+ 	
+ 	 <!-- 메인 > 사용자 정보 update -->
+ 	<update id="updFsysUserUserUpdPDtlPop" parameterType="java.util.HashMap">
+        /* fsysUserDAO.updFsysUserUserUpdPDtlPop 사용자 정보 수정 */
+        UPDATE USER
+           SET EMAIL           = #{email}
+             , USER_NM         = #{userNm}
+             , TEL_NO          = #{telNo}
+             , UPDR_ID         = #{session.userid}
+             , UPD_DT          = NOW()
+         WHERE USER_ID = #{userId}
+    </update>
+ 	
+ 	
+ 	<!-- 비밀번호 변경 전 이전 비밀번호 일치 여부 확인 -->
+    <select id="selectUserPw" parameterType="java.util.HashMap" resultType="int">
+        /* adminUser.selectUserPw 비밀번호 변경 전 이전 비밀번호 일치 여부 확인 */
+        SELECT COUNT(*) AS CNT
+          FROM USER
+         WHERE USER_ID = #{userId}
+            <![CDATA[
+           AND PWD     = #{chkPwd}
+            ]]>
+    </select>
+    
+ 	
+ 	<!-- 메인 > 비밀번호 정보 update -->
+ 	<update id="chgPwFsysUserUserUpdPDtlPop" parameterType="java.util.HashMap">
+ 	
+        /* fsysUserDAO.chgPwFsysUserUserUpdPDtlPop 비밀번호 수정 */
+        UPDATE USER
+           SET PWD             = #{pwd}
+             , PWD_CHG_DT      = DATE_FORMAT(now(), '%Y%m%d')
+              <if test="pwdFindQues != null and pwdFindQues != '' ">
+             , PWD_FIND_QUES   = #{pwdFindQues} 
+              </if>
+               <if test="pwdFindAsw != null and pwdFindAsw != '' ">
+             , PWD_FIND_ASW    = #{pwdFindAsw}
+               </if>
+             , UPDR_ID         = #{userId}
+             , UPD_DT          = NOW()
+         WHERE USER_ID = #{userId}
+         
+    </update>
+    
+    
+
+    
+        <update id="updateUserPwDate" parameterType="java.util.HashMap">
+        /* adminUser.updateUserPwDate 3개월 후 비밀번호 변경 */
+        <![CDATA[
+        UPDATE USER
+           SET PWD_CHG_DT  = TO_CHAR(SYSDATE + 90 , 'YYYYMMDD')
+              ,UPD_DT      = SYSDATE
+              ,UPDR_ID     = #{userId}
+         WHERE USER_ID     = #{userId}
+        ]]>
+    </update>
+ 	
+ 	
+ 	
+</mapper>

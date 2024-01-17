@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<!--
+    SQL File Name : FsysLogDAO.xml
+    Description : 로그 목록
+    Author : sjw
+    Since : 2021.04.26
+-->
+<mapper namespace="fsysLogDAO">
+
+    <sql id="conditionList">
+		<if test="fsysLogQListId != null and fsysLogQListId != ''">
+			AND RQESTER_ID LIKE CONCAT('%', #{fsysLogQListId}, '%')
+		</if>
+		<if test="fsysLogQListURL != null and fsysLogQListURL != ''">
+			AND URL LIKE CONCAT('%', #{fsysLogQListURL}, '%')
+		</if>
+		<if test="fsysLogQListIp != null and fsysLogQListIp != ''">
+			AND RQESTER_IP LIKE CONCAT('%', #{fsysLogQListIp}, '%')
+		</if>
+		<if test="searchRegFromDt != null and searchRegFromDt != '' ">
+			AND DATE_FORMAT(OCCRRNC_DE, '%Y%m%d') <![CDATA[>=]]> REPLACE(#{searchRegFromDt},'-','')
+		</if>
+		<if test="searchRegToDt != null and searchRegToDt != '' ">
+			AND DATE_FORMAT(OCCRRNC_DE, '%Y%m%d') <![CDATA[<=]]> REPLACE(#{searchRegToDt},'-','')
+		</if>
+		<if test="fsysLogQMenuNm != null and fsysLogQMenuNm != '' ">
+			AND b.MENU_NM LIKE CONCAT('%', #{fsysLogQMenuNm}, '%')
+		</if>
+    </sql>
+    
+	<!-- 로그 리스트 토탈 카운트 -->
+    <select id="queryFsysLogQListTotCnt" parameterType="java.util.HashMap" resultType="int">
+    	/* queryFsysLogQListTotCnt 로그 리스트 토탈 카운트 */
+		SELECT
+			COUNT(DISTINCT c.REQUST_ID) AS TOT_CNT
+		FROM (
+			SELECT 
+				a.REQUST_ID
+				, DATE_FORMAT(a.OCCRRNC_DE, '%Y-%m-%d') OCCRRNC_DE_DT
+				, a.URL LOG_URL
+				, a.RQESTER_ID RQESTER_ID
+				, a.RQESTER_IP RQESTER_IP
+				, a.RQESTER_PARAM RQESTER_PARAM
+				, a.RQESTER_MENU_ID RQESTER_MENU_ID
+				, CASE
+					WHEN a.RQESTER_MENU_ID = '1' THEN '메인'
+					ELSE b.MENU_NM
+				  END MENU_NM
+			FROM
+				COMTNWEBLOG a
+			LEFT OUTER JOIN MENUINFO b
+				ON (a.RQESTER_MENU_ID = b.MENU_NO)
+		) c
+		<where>
+			<if test="fsysLogQListId != null and fsysLogQListId != ''">
+				AND c.RQESTER_ID LIKE CONCAT('%', #{fsysLogQListId}, '%')
+			</if>
+			<if test="fsysLogQListURL != null and fsysLogQListURL != ''">
+				AND c.LOG_URL LIKE CONCAT('%', #{fsysLogQListURL}, '%')
+			</if>
+			<if test="fsysLogQListIp != null and fsysLogQListIp != ''">
+				AND c.RQESTER_IP LIKE CONCAT('%', #{fsysLogQListIp}, '%')
+			</if>
+			<if test="searchRegFromDt != null and searchRegFromDt != '' ">
+				AND DATE_FORMAT(c.OCCRRNC_DE_DT, '%Y%m%d') <![CDATA[>=]]> REPLACE(#{searchRegFromDt},'-','')
+			</if>
+			<if test="searchRegToDt != null and searchRegToDt != '' ">
+				AND DATE_FORMAT(c.OCCRRNC_DE_DT, '%Y%m%d') <![CDATA[<=]]> REPLACE(#{searchRegToDt},'-','')
+			</if>
+			<if test="fsysLogQMenuNm != null and fsysLogQMenuNm != '' ">
+				AND c.MENU_NM LIKE CONCAT('%', #{fsysLogQMenuNm}, '%')
+			</if>
+		</where>
+    </select> 
+    
+    <!-- 로그 리스트 -->
+	<select id="selectFsysLogList" parameterType="java.util.HashMap" resultType="egovMap">
+        /* fsysLogDAO.selectFsysLogList 로그 리스트 조회 */
+		SELECT
+			c.*
+		FROM (
+			SELECT 
+				a.REQUST_ID
+				, DATE_FORMAT(a.OCCRRNC_DE, '%Y-%m-%d') OCCRRNC_DE_DT
+				, a.OCCRRNC_DE OCCRRNC_DE
+				, a.URL LOG_URL
+				, a.RQESTER_ID RQESTER_ID
+				, a.RQESTER_IP RQESTER_IP
+				, a.RQESTER_PARAM RQESTER_PARAM
+				, a.RQESTER_MENU_ID RQESTER_MENU_ID
+				, CASE
+					WHEN a.RQESTER_MENU_ID = '1' THEN '메인'
+					ELSE b.MENU_NM
+				  END MENU_NM
+			FROM
+				COMTNWEBLOG a
+			LEFT OUTER JOIN MENUINFO b
+				ON (a.RQESTER_MENU_ID = b.MENU_NO)
+		) c
+		<where>
+			<if test="fsysLogQListId != null and fsysLogQListId != ''">
+				AND c.RQESTER_ID LIKE CONCAT('%', #{fsysLogQListId}, '%')
+			</if>
+			<if test="fsysLogQListURL != null and fsysLogQListURL != ''">
+				AND c.LOG_URL LIKE CONCAT('%', #{fsysLogQListURL}, '%')
+			</if>
+			<if test="fsysLogQListIp != null and fsysLogQListIp != ''">
+				AND c.RQESTER_IP LIKE CONCAT('%', #{fsysLogQListIp}, '%')
+			</if>
+			<if test="searchRegFromDt != null and searchRegFromDt != '' ">
+				AND DATE_FORMAT(c.OCCRRNC_DE_DT, '%Y%m%d') <![CDATA[>=]]> REPLACE(#{searchRegFromDt},'-','')
+			</if>
+			<if test="searchRegToDt != null and searchRegToDt != '' ">
+				AND DATE_FORMAT(c.OCCRRNC_DE_DT, '%Y%m%d') <![CDATA[<=]]> REPLACE(#{searchRegToDt},'-','')
+			</if>
+			<if test="fsysLogQMenuNm != null and fsysLogQMenuNm != '' ">
+				AND c.MENU_NM LIKE CONCAT('%', #{fsysLogQMenuNm}, '%')
+			</if>
+		</where>
+		ORDER BY
+			c.OCCRRNC_DE DESC
+		LIMIT
+			#{pageStart}, #{perPageNum}
+	</select>
+    
+    <!-- @!@ 상세 로그 리스트 -->
+    <select id="queryFsysLogDtlQList" parameterType="java.util.HashMap" resultType="egovMap">
+    	/* queryFsysLogDtlMList @!@ 상세 로그 리스트 */
+		SELECT
+			a.REQUST_ID 
+			, DATE_FORMAT(a.OCCRRNC_DE, '%Y-%m-%d') occrrncDeDt
+			, a.URL
+			, a.RQESTER_ID
+			, a.RQESTER_IP
+			, a.RQESTER_PARAM
+			, a.RQESTER_MENU_ID 
+			, CASE
+				WHEN a.RQESTER_MENU_ID = '1' THEN '메인'
+				ELSE b.MENU_NM
+			  END menuNm
+		FROM
+			COMTNWEBLOG a
+		LEFT OUTER  JOIN MENUINFO b
+			ON (a.RQESTER_MENU_ID = b.MENU_NO)
+		WHERE
+			a.REQUST_ID=#{srcRequstId}
+    </select>
+	
+
+    <select id="queryFsysLogDtlQListTotCnt" parameterType="java.util.HashMap" resultType="int">
+    	/* queryFsysLogDtlMListTotCnt @!@ 상세 로그 리스트 토탈 카운트 */
+		SELECT
+    		COUNT(*) AS TOT_CNT
+		FROM 
+			COMTNWEBLOG
+		WHERE 
+			REQUST_ID=#{srcRequstId}
+		JOIN MENUINFO b
+			ON (a.RQESTER_MENU_ID = b.MENU_NO)
+    </select>
+
+</mapper>
