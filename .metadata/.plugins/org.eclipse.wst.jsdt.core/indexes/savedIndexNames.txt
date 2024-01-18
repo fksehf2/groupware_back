@@ -1,0 +1,7 @@
+INDEX VERSION 1.4+D:\yera\jims\.metadata\.plugins\org.eclipse.wst.jsdt.core\indexes
+822282099.index
+1891887375.index
+380745089.index
+3481883282.index
+3212938168.index
+90382158.index

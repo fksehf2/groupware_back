@@ -1,0 +1,457 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="eqpMgmtDAO">
+
+	<!-- 장비관리 검색 조건-->
+    <sql id="WeqpMgmtList">
+            <if test="schEqpSno != null and schEqpSno != '' ">
+                AND a.EQP_SNO LIKE  CONCAT('%' , #{schEqpSno} , '%')
+            </if>
+            <if test="schEqpNm != null and schEqpNm != '' ">
+                AND a.EQP_NM LIKE  CONCAT('%' , #{schEqpNm} , '%')
+            </if>
+            <if test="schEqpTyp != null and schEqpTyp != '' ">
+                AND a.EQP_TYP = #{schEqpTyp}
+            </if>
+            <if test="schStPurcDt != null and schStPurcDt != '' ">
+            	AND a.PURC_DT <![CDATA[>=]]> REPLACE(#{schStPurcDt},'-','')
+            </if>
+            <if test="schEdPurcDt != null and schEdPurcDt != '' ">
+            	AND a.PURC_DT <![CDATA[<=]]> REPLACE(#{schEdPurcDt},'-','') 
+            </if>
+    </sql>
+    
+ 	<!-- 장비관리 조회 -->
+    <select id="eqpMgmtMList" parameterType="java.util.HashMap" resultType="egovMap">
+        /* eqpMgmtDAO.eqpMgmtMList 장비관리 조회 */
+        
+    select
+		@ROWNUM := @ROWNUM + 1 AS rNum
+		, a.EQP_SNO as eqpSno
+		, a.EQP_NM as eqpNm
+		, a.SR_NO as srNo
+		, a.EQP_TYP as eqpTyp
+		, CASE a.EQP_TYP 
+				 WHEN 'C05001' THEN (SELECT CD_NM FROM CODE_DTL WHERE CD = 'C05001')/*데스크탑*/
+				 WHEN 'C05002' THEN (SELECT CD_NM FROM CODE_DTL WHERE CD = 'C05002')/*노트북*/
+				 WHEN 'C05003' THEN (SELECT CD_NM FROM CODE_DTL WHERE CD = 'C05003')/*모니터*/
+				 WHEN 'C05004' THEN (SELECT CD_NM FROM CODE_DTL WHERE CD = 'C05004')/*기타*/
+				 WHEN 'C05005' THEN (SELECT CD_NM FROM CODE_DTL WHERE CD = 'C05005')/*가구*/
+				 WHEN 'C05006' THEN (SELECT CD_NM FROM CODE_DTL WHERE CD = 'C05006')/*프린터*/
+			END eqpTypNm
+		, a.PURC_DT as purcDt
+		, a.EXPR_DT as exprDt
+		, a.MNFT_CO as mnftCo
+		, a.MDL_NM as mdlNm
+		, a.REMARKS
+		, (
+			select 
+				ta.USER_NM 
+			from USER ta, EQP_USER_DTL tb
+			where 1=1
+				and ta.USER_ID = tb.USER_ID
+				and tb.EQP_SNO = a.EQP_SNO 
+				and ta.USE_YN = 'Y'
+				and tb.USE_YN = 'Y'
+			) as userNm
+	from EQUIPMENT_MGMT a
+	where a.USE_YN = 'Y'
+		<include refid="WeqpMgmtList"/>
+	order by a.REG_DT DESC
+    LIMIT #{pageStart}, #{perPageNum}
+
+    </select>
+	
+	<!-- 조회 갯수 -->
+    <select id="eqpMgmtMListTotCnt" parameterType="java.util.HashMap" resultType="int">
+        /* eqpMgmtDAO.eqpMgmtMListTotCnt 장비관리 조회 TotalCnt */
+        
+        select
+			count(*)
+		from
+		(
+			select
+				@ROWNUM := @ROWNUM + 1 AS rNum
+				, a.EQP_SNO as eqpSno
+				, a.EQP_NM as eqpNm
+				, a.SR_NO as srNo
+				, a.EQP_TYP as eqpTyp
+				, CASE a.EQP_TYP 
+						WHEN 'C05001' THEN (SELECT CD_NM FROM CODE_DTL WHERE CD = 'C05001')/*데스크탑*/
+						WHEN 'C05002' THEN (SELECT CD_NM FROM CODE_DTL WHERE CD = 'C05002')/*노트북*/
+						WHEN 'C05003' THEN (SELECT CD_NM FROM CODE_DTL WHERE CD = 'C05003')/*모니터*/
+						WHEN 'C05004' THEN (SELECT CD_NM FROM CODE_DTL WHERE CD = 'C05004')/*기타*/
+                        WHEN 'C05005' THEN (SELECT CD_NM FROM CODE_DTL WHERE CD = 'C05005')/*가구*/
+                        WHEN 'C05006' THEN (SELECT CD_NM FROM CODE_DTL WHERE CD = 'C05006')/*프린터*/
+					END eqpTypNm
+				, a.PURC_DT as purcDt
+				, a.EXPR_DT as exprDt
+				, a.MNFT_CO as mnftCo
+				, a.MDL_NM as mdlNm
+				, (
+					select 
+						ta.USER_NM 
+					from USER ta, EQP_USER_DTL tb
+					where 1=1
+						and ta.USER_ID = tb.USER_ID
+						and tb.EQP_SNO = a.EQP_SNO
+						and ta.USE_YN = 'Y'
+						and tb.USE_YN = 'Y' 
+					) as userNm
+			from EQUIPMENT_MGMT a
+			where a.USE_YN = 'Y'
+        		<include refid="WeqpMgmtList"/> 
+		) q
+        
+    </select>
+    
+    <!-- 장비관리 장비 등록 -->
+    <insert id="regEqpMgmtRDtl" parameterType="java.util.HashMap">
+    	/* regEqpMgmtRDtl 장비관리 장비 등록 */
+    	
+    			INSERT EQUIPMENT_MGMT (
+    												  EQP_SNO
+													, EQP_BUY_DIV
+													, EQP_NM
+													, SR_NO
+													, EQP_TYP
+													, PURC_DT
+													, EXPR_DT
+													, GUAR_TRM
+													, MNFT_CO
+													, MDL_NM
+													, MNFT_NAT
+													<if test="unitAmt != null and unitAmt != '' ">
+													, UNIT_AMT
+													</if>
+													, DEPR_PRID
+													, HLD_PLC
+													, USE_YN
+													, REG_DT
+													, REGR_ID
+													, UPD_DT
+													, UPDR_ID
+													<if test=" eqpTyp == 'C05001' or eqpTyp == 'C05002' ">
+													, CPU
+													, RAM
+													, HDD_VOL
+													, SSD_VOL
+													, GRAPHICS
+													</if>
+													<if test=" eqpTyp == 'C05003' ">
+													, MNTR_SIZE
+													, MNTR_RES
+													</if>
+													, REMARKS
+												)
+										  VALUES(
+										  			  ( SELECT CONCAT((
+                                                        SELECT 
+                                                        case 
+                                                        	when #{eqpTyp} = 'C05001' then 'DSK'
+                                                        	when #{eqpTyp} = 'C05002' then 'NTB'
+                                                        	when #{eqpTyp} = 'C05003' then 'MNT'
+                                                        	when #{eqpTyp} = 'C05004' then 'ETC'
+                                                        	when #{eqpTyp} = 'C05005' then 'FNT'
+                                                        	when #{eqpTyp} = 'C05006' then 'PRT'
+                                                        end
+                                                        from dual
+                                                        ), LPAD(IFNULL(CAST(MAX(CAST(SUBSTR(A.EQP_SNO,4)  AS INT)) as char),0) + 1,7,'0')) FROM EQUIPMENT_MGMT A
+                                                        where 1=1
+                                                        and A.EQP_TYP = #{eqpTyp}
+                                                        ) 
+													, #{eqpBuyDiv}
+													, #{eqpNm}
+													, #{srNo}
+													, #{eqpTyp}
+													, REPLACE(#{purcDt},'-','')
+													, REPLACE(#{exprDt},'-','')
+													, #{guarTrm}
+													, #{mnftCo}
+													, #{mdlNm}
+													, #{mnftNat}
+													<if test="unitAmt != null and unitAmt != '' ">
+													, REPLACE(#{unitAmt},',','')
+													</if>
+													, #{deprPrid}
+													, #{hldPlc}
+													, 'Y'
+													, now()
+										            , #{session_userid}
+										            , now()
+										            , #{session_userid}
+													<if test=" eqpTyp == 'C05001' or eqpTyp == 'C05002' ">
+										            , #{cpu}
+										            , #{ram}
+										            , #{hddVol}
+										            , #{ssdVol}
+										            , #{graphics}
+													</if>
+													<if test=" eqpTyp == 'C05003' ">
+										            , #{mntrSize}
+										            , #{mntrRes}
+													</if>
+													, #{remarks}
+												);
+
+    </insert>
+    
+ 	<!-- 장비관리 상세  -->
+    <select id="queryEqpMgmtUDtl" parameterType="java.util.HashMap" resultType="egovMap">
+        /* eqpMgmtDAO.queryEqpMgmtUDtl 장비관리 상세 */
+    select
+		a.EQP_SNO as eqpSno
+		, a.EQP_NM as eqpNm
+		, a.SR_NO as srNo
+		, a.EQP_BUY_DIV as eqpBuyDiv
+		, a.EQP_TYP as eqpTyp
+		, CASE a.EQP_TYP 
+				 WHEN 'C05001' THEN (SELECT CD_NM FROM CODE_DTL WHERE CD = 'C05001')/*데스크탑*/
+				 WHEN 'C05002' THEN (SELECT CD_NM FROM CODE_DTL WHERE CD = 'C05002')/*노트북*/
+				 WHEN 'C05003' THEN (SELECT CD_NM FROM CODE_DTL WHERE CD = 'C05003')/*모니터*/
+				 WHEN 'C05004' THEN (SELECT CD_NM FROM CODE_DTL WHERE CD = 'C05004')/*기타*/
+				 WHEN 'C05005' THEN (SELECT CD_NM FROM CODE_DTL WHERE CD = 'C05005')/*가구*/
+				 WHEN 'C05006' THEN (SELECT CD_NM FROM CODE_DTL WHERE CD = 'C05006')/*프린터*/
+			END eqpTypNm
+		, a.PURC_DT as purcDt
+		, a.EXPR_DT as exprDt
+		, a.GUAR_TRM as guarTrm
+		, a.MNFT_CO as mnftCo
+		, a.MDL_NM as mdlNm
+		, a.MNFT_NAT as mnftNat
+		, a.DEPR_PRID as deprPrid
+		, FORMAT(a.UNIT_AMT,0) as unitAmt
+		, a.CPU as cpu
+		, a.RAM as ram
+		, a.HDD_VOL as hddVol
+		, a.SSD_VOL as ssdVol
+		, a.GRAPHICS as graphics
+		, a.MNTR_SIZE as mntrSize
+		, a.MNTR_RES as mntrRes
+		, a.REMARKS as remarks
+		, a.HLD_PLC as hldPlc
+	from EQUIPMENT_MGMT a
+	where a.USE_YN = 'Y'
+		and a.EQP_SNO= #{eqpSno};
+
+    </select>
+
+	<!-- 장비관리 수정  -->
+    <update id="updEqpMgmtUDtl" parameterType="java.util.HashMap">
+		/* updEqpMgmtUDtl 장비 관리 수정 */
+		UPDATE EQUIPMENT_MGMT
+			SET 
+			EQP_BUY_DIV	= #{eqpBuyDiv} 
+			, EQP_NM = #{eqpNm} 
+			, SR_NO	= #{srNo} 
+			, EQP_TYP = #{eqpTyp} 
+			, PURC_DT = REPLACE(#{purcDt},'-','')
+			, EXPR_DT = REPLACE(#{exprDt},'-','')
+			, GUAR_TRM = #{guarTrm} 
+			, MNFT_CO = #{mnftCo} 
+			, MDL_NM = #{mdlNm} 
+			, MNFT_NAT = #{mnftNat} 
+			, DEPR_PRID = #{deprPrid} 
+			<if test="unitAmt != null and unitAmt != '' ">
+			, UNIT_AMT = REPLACE(#{unitAmt},',','')
+			</if>
+			, HLD_PLC = #{hldPlc}
+			, CPU = #{cpu} 
+			, RAM = #{ram}
+			, HDD_VOL = #{hddVol}
+			, SSD_VOL = #{ssdVol} 
+			, GRAPHICS = #{graphics} 
+			, MNTR_SIZE = #{mntrSize} 
+			, MNTR_RES = #{mntrRes} 
+			, REMARKS = #{remarks} 
+			, UPD_DT = now()
+			, UPDR_ID = #{session_userid}
+		WHERE USE_YN = 'Y'
+			and EQP_SNO = #{ eqpSno }
+    </update>
+
+	<!-- 장비관리 삭제  -->
+    <delete id="delEqpMgmtUDtl" parameterType="java.util.HashMap">
+		/* delEqpMgmtUDtl 장비 관리 삭제 */
+		DELETE FROM EQUIPMENT_MGMT WHERE EQP_SNO = #{ eqpSno }
+    </delete>
+
+	<!-- 장비관리 엑셀 -->
+    <insert id="updExcEqpMgmtMList" parameterType="java.util.HashMap" >
+		
+    	INSERT INTO EQUIPMENT_MGMT 
+		(
+			EQP_SNO
+			, EQP_BUY_DIV
+			, EQP_NM
+			, SR_NO
+			, EQP_TYP
+			, PURC_DT
+			, EXPR_DT
+			, GUAR_TRM
+			, MNFT_CO
+			, MDL_NM
+			, MNFT_NAT
+			, UNIT_AMT
+			, DEPR_PRID
+			, HLD_PLC
+			, USE_YN
+			, REG_DT
+			, REGR_ID
+			, UPD_DT
+			, UPDR_ID
+			, CPU
+			, RAM
+			, HDD_VOL
+			, SSD_VOL
+			, GRAPHICS
+			, MNTR_SIZE
+			, MNTR_RES
+			, REMARKS
+		)
+		VALUES
+		(
+			( SELECT CONCAT((
+              SELECT 
+              case 
+              	when #{eqpTyp} = 'C05001' then 'DSK'
+              	when #{eqpTyp} = 'C05002' then 'NTB'
+              	when #{eqpTyp} = 'C05003' then 'MNT'
+              	when #{eqpTyp} = 'C05004' then 'ETC'
+              	when #{eqpTyp} = 'C05005' then 'FNT'
+              	when #{eqpTyp} = 'C05006' then 'PRT'
+              end
+              from dual
+              ), LPAD(IFNULL(CAST(MAX(CAST(SUBSTR(A.EQP_SNO,4)  AS INT)) as char),0) + 1,7,'0')) FROM EQUIPMENT_MGMT A
+              where 1=1
+              and A.EQP_TYP = #{eqpTyp}
+              )  
+			, #{eqpBuyDiv}
+			, #{eqpNm}
+			, #{srNo}
+			, #{eqpTyp}
+			, REPLACE(#{purcDt},'-','')
+			, REPLACE(#{exprDt},'-','')
+			, #{guarTrm}
+			, #{mnftCo}
+			, #{mdlNm}
+			, #{mnftNat}
+			, CASE WHEN #{unitAmt} = '' OR #{unitAmt} IS NULL
+			then 0
+			else REPLACE(#{unitAmt},',','')
+			END
+			, #{deprPrid}
+			, #{hldPlc}
+			, 'Y'
+			, now()
+			, #{session_userid}
+			, now()
+			, #{session_userid}
+			, #{cpu}
+			, #{ram}
+			, #{hddVol}
+			, #{ssdVol}
+			, #{graphics}
+			, #{mntrSize}
+			, #{mntrRes}
+			, #{remarks}
+		)
+		ON DUPLICATE KEY 
+		UPDATE EQP_NM = #{eqpNm}
+				,EQP_BUY_DIV = #{eqpBuyDiv}
+				,EQP_CNTR_NO = #{eqpCntrNo}
+				,MNFT_CO = #{mnftCo}
+				,MDL_NM = #{mdlNm}
+				,MNFT_NAT = #{mnftNat}
+			<if test="unitAmt != null and unitAmt != '' ">
+				,UNIT_AMT = REPLACE(#{unitAmt},',','')
+			</if>
+			<if test="unitAmt == null or unitAmt == '' ">
+				,UNIT_AMT = NULL
+			</if>
+			<if test="purcQty != null and purcQty != '' ">
+				,PURC_QTY = REPLACE(#{purcQty},',','')
+			</if>
+			<if test="purcQty == null or purcQty == '' ">
+				,PURC_QTY = NULL
+			</if>  
+			<if test="sumAmt != null and sumAmt != '' ">
+				,SUM_AMT = REPLACE(#{sumAmt},',','')
+			</if>
+			<if test="sumAmt == null or sumAmt == '' ">
+				,SUM_AMT = NULL
+			</if>  
+			<if test="dstbQty != null and dstbQty != '' ">
+				,DSTB_QTY = REPLACE(#{dstbQty},',','')
+			</if>
+			<if test="dstbQty == null or dstbQty == '' ">
+				,DSTB_QTY = NULL
+			</if>   
+				,DEPR_PRID = #{deprPrid}
+				,PAY_DIV = #{payDiv}
+				,UPD_DT = NOW()
+				,UPDR_ID = #{session_userid}
+	</insert>
+	
+	    
+    <!-- 장비관리 검색 조건-->
+    <sql id="WeqpMgmtListPop">
+            <if test="schEqpNmPop != null and schEqpNmPop != '' ">
+                AND A.EQP_SNO LIKE  CONCAT('%' , #{schEqpNmPop} , '%')
+            </if>
+            <if test="schEqpTypPop != null and schEqpTypPop != '' ">
+                AND A.EQP_TYP = #{schEqpTypPop}
+            </if>
+    </sql>
+    
+ 	 <!-- 장비관리 조회 팝업-->
+     <select id="eqpMgmtMListPop" parameterType="java.util.HashMap" resultType="egovMap">
+        /* eqpMgmtDAO.eqpMgmtMListPop 장비관리 조회 팝업 */
+        
+           	SELECT *
+              FROM (
+              			SELECT  @ROWNUM := @ROWNUM + 1 AS RNUM    
+              					, A.EQP_SNO
+								, A.EQP_NM
+								, A.SR_NO
+								, A.EQP_TYP
+								, FN_GET_CODENM(A.EQP_TYP) AS EQP_TYP_NM
+								, A.MDL_NM
+								, A.MNFT_CO
+								, A.PURC_DT
+								, A.REG_DT 
+						 FROM EQUIPMENT_MGMT A
+              			      ,(SELECT @ROWNUM := 0) R   
+						WHERE 1=1
+						  AND A.USE_YN = 'Y'
+						  AND NOT EXISTS (
+											 SELECT EUD.EQP_SNO
+											   FROM EQP_USER_DTL EUD
+											  WHERE EUD.EQP_SNO = A.EQP_SNO
+											    AND EUD.PGS_STAT = 'C03001' 
+						                 )  
+              		  <include refid="WeqpMgmtListPop"/>
+              		)A
+            LIMIT #{pageStart}, #{perPageNum}
+
+    </select>
+	
+	<!-- 장비관리 조회 팝업 TotalCnt -->
+    <select id="eqpMgmtMListPopTotCnt" parameterType="java.util.HashMap" resultType="int">
+        /* eqpMgmtDAO.eqpMgmtMListPopTotCnt 장비관리 조회 팝업 TotalCnt */
+        
+        SELECT COUNT(DISTINCT A.EQP_SNO) AS TOTCNT
+          FROM EQUIPMENT_MGMT A
+         WHERE 1=1
+						  AND A.USE_YN = 'Y'
+						  AND NOT EXISTS (
+											 SELECT EUD.EQP_SNO
+											   FROM EQP_USER_DTL EUD
+											  WHERE EUD.EQP_SNO = A.EQP_SNO
+											    AND EUD.PGS_STAT = 'C03001' 
+						                 )  
+        <include refid="WeqpMgmtListPop"/> 
+        
+    </select>
+</mapper>
