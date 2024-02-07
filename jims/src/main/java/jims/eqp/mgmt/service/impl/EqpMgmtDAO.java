@@ -1,9 +1,13 @@
 package jims.eqp.mgmt.service.impl;
 
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.springframework.stereotype.Repository;
 
 import egovframework.com.cmm.service.impl.EgovComAbstractDAO;
+import jims.eqp.mgmt.service.EqpDto;
 
 /**
  * 
@@ -65,6 +69,26 @@ public class EqpMgmtDAO extends EgovComAbstractDAO {
 	public void delEqpMgmtUDtl(HashMap<String, String> map) throws Exception {
 		update("eqpMgmtDAO.delEqpMgmtUDtl", map);
 
+	}
+	
+	public List getEqpList(int offset, int limit) throws Exception {
+		Map<String, Integer> params = new HashMap<>();
+		params.put("offset", offset);
+		params.put("limit", limit);
+		return selectList("eqpMgmtDAO.eqpMgmtMList2", params);
+	}
+	
+	public List getErpCode(String cdId) throws Exception {
+		return selectList("eqpMgmtDAO.getErpCode", cdId);
+				
+	}
+	
+	public int getErpTotCnt() throws Exception {
+		return selectOne("eqpMgmtDAO.eqpMgmtMListTotCnt");
+	}
+	
+	public List erpDtl(String eqpSno) throws Exception{
+		return selectList("eqpMgmtDAO.queryEqpMgmtUDtl", eqpSno);
 	}
 	
 }

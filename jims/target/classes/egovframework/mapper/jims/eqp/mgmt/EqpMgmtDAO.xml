@@ -24,11 +24,9 @@
     
  	<!-- 장비관리 조회 -->
     <select id="eqpMgmtMList" parameterType="java.util.HashMap" resultType="egovMap">
-        /* eqpMgmtDAO.eqpMgmtMList 장비관리 조회 */
-        
-    select
-		@ROWNUM := @ROWNUM + 1 AS rNum
-		, a.EQP_SNO as eqpSno
+     select
+<!-- 		@ROWNUM := @ROWNUM + 1 AS rNum
+		, --> a.EQP_SNO as eqpSno
 		, a.EQP_NM as eqpNm
 		, a.SR_NO as srNo
 		, a.EQP_TYP as eqpTyp
@@ -453,5 +451,58 @@
 						                 )  
         <include refid="WeqpMgmtListPop"/> 
         
+    </select>
+    
+     	<!-- 장비관리 조회 -->
+    <select id="eqpMgmtMList2" parameterType="java.util.HashMap" resultType="egovMap">
+        /* eqpMgmtDAO.eqpMgmtMList2 장비관리 조회 */
+<!-- 	 SET @ROWNUM := 0;   -->
+     select
+	 @ROWNUM := @ROWNUM + 1 AS rNum
+		, a.EQP_SNO as eqpSno
+		, a.EQP_NM as eqpNm
+		, a.SR_NO as srNo
+		, a.EQP_TYP as eqpTyp
+		, CASE a.EQP_TYP 
+				 WHEN 'C05001' THEN (SELECT CD_NM FROM CODE_DTL WHERE CD = 'C05001')/*데스크탑*/
+				 WHEN 'C05002' THEN (SELECT CD_NM FROM CODE_DTL WHERE CD = 'C05002')/*노트북*/
+				 WHEN 'C05003' THEN (SELECT CD_NM FROM CODE_DTL WHERE CD = 'C05003')/*모니터*/
+				 WHEN 'C05004' THEN (SELECT CD_NM FROM CODE_DTL WHERE CD = 'C05004')/*기타*/
+				 WHEN 'C05005' THEN (SELECT CD_NM FROM CODE_DTL WHERE CD = 'C05005')/*가구*/
+				 WHEN 'C05006' THEN (SELECT CD_NM FROM CODE_DTL WHERE CD = 'C05006')/*프린터*/
+			END eqpTypNm
+		, a.PURC_DT as purcDt
+		, a.EXPR_DT as exprDt
+		, a.MNFT_CO as mnftCo
+		, a.MDL_NM as mdlNm
+		, a.REMARKS
+		, (
+			select 
+				ta.USER_NM 
+			from USER ta, EQP_USER_DTL tb
+			where 1=1
+				and ta.USER_ID = tb.USER_ID
+				and tb.EQP_SNO = a.EQP_SNO 
+				and ta.USE_YN = 'Y'
+				and tb.USE_YN = 'Y'
+			) as userNm
+	from EQUIPMENT_MGMT a
+	where a.USE_YN = 'Y'
+<!-- 		<include refid="WeqpMgmtList"/> -->
+	order by a.REG_DT DESC
+    LIMIT #{offset}, #{limit}
+
+
+    </select>
+    
+    <select id="getErpCode" parameterType="java.lang.String" resultType="egovMap">
+    SELECT A.CD_ID, A.CD_ID_NM, B.CD, B.CD_NM
+	FROM CODE A,
+	     CODE_DTL B
+	WHERE A.CD_ID = B.CD_ID
+	  AND A.USE_YN = 'Y'
+	  AND B.USE_YN = 'Y'
+	  AND A.CD_ID = #{cdId}
+	ORDER BY A.CD_ID ASC, B.SORT_ORD ASC, B.CD ASC
     </select>
 </mapper>

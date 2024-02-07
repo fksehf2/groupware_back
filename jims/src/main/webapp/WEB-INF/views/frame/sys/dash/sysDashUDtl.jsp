@@ -136,7 +136,7 @@ function fn_ajaxCodeListCallback(data){
  * @returns 
  */
 function fn_ajaxCodeListCallback2(data){
-	var list = data.C19;
+	var list = data;
 	var listCnt = list.length;
 	
 	$("#listTab > tbody").empty();
@@ -145,7 +145,7 @@ function fn_ajaxCodeListCallback2(data){
 		var append = "";
 		append += "<tr>";
 		
-		append += "<td colspan='"+tabTdCnt+"'>"+nullListMsg+"</td>";
+		append += "<td colspan='"+listCnt +"'>"+nullListMsg+"</td>";
 		
 		append += "</tr>";
 		$("#listTab > tbody").append(append);
@@ -188,7 +188,7 @@ function fn_queryMDtl(){
  * @returns 
  */
 function fn_queryMDtlCallback(data){
-	var list = data.list;
+	var list = data.C19;
 	var listCnt = list.length;
 	
 	if(listCnt > 0){

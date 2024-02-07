@@ -24,8 +24,9 @@
  	    <!-- 비밀번호 오류 회수 조회 -->
     <select id="getPwdErrCnt" parameterType="frame.flyt.login.service.FLytLoginVO" resultType="int">
         /* adminUserDAO.getPwdErrCnt 비밀번호 오류 회수 조회 */
+<!--         SELECT NVL(PWD_ERR_CNT,0) -->
     <![CDATA[
-        SELECT NVL(PWD_ERR_CNT,0)
+        SELECT IFNULL(PWD_ERR_CNT,0)
         FROM USER
         WHERE USER_ID = #{userId}
     ]]>
