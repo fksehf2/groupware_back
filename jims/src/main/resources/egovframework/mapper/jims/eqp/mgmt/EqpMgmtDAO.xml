@@ -488,11 +488,9 @@
 			) as userNm
 	from EQUIPMENT_MGMT a
 	where a.USE_YN = 'Y'
-<!-- 		<include refid="WeqpMgmtList"/> -->
+	<include refid="WeqpMgmtList"/> 
 	order by a.REG_DT DESC
-    LIMIT #{offset}, #{limit}
-
-
+    LIMIT #{offset}, #{perPageNum}
     </select>
     
     <select id="getErpCode" parameterType="java.lang.String" resultType="egovMap">

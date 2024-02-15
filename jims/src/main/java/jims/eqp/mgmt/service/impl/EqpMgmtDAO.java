@@ -71,10 +71,11 @@ public class EqpMgmtDAO extends EgovComAbstractDAO {
 
 	}
 	
-	public List getEqpList(int offset, int limit) throws Exception {
-		Map<String, Integer> params = new HashMap<>();
+	public List getEqpList(Map<String, Object> params, Integer offset,
+           Integer perPageNum) throws Exception {
+//		Map<String, Integer> params = new HashMap<>();
 		params.put("offset", offset);
-		params.put("limit", limit);
+		params.put("perPageNum", perPageNum);
 		return selectList("eqpMgmtDAO.eqpMgmtMList2", params);
 	}
 	
@@ -83,8 +84,11 @@ public class EqpMgmtDAO extends EgovComAbstractDAO {
 				
 	}
 	
-	public int getErpTotCnt() throws Exception {
-		return selectOne("eqpMgmtDAO.eqpMgmtMListTotCnt");
+	public int getErpTotCnt(Map<String, Object> params, Integer offset,
+            Integer perPageNum) throws Exception {
+		params.put("offset", offset);
+		params.put("perPageNum", perPageNum);
+		return selectOne("eqpMgmtDAO.eqpMgmtMListTotCnt", params);
 	}
 	
 	public List erpDtl(String eqpSno) throws Exception{

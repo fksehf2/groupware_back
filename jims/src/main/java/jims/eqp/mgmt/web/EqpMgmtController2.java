@@ -104,7 +104,7 @@ public class EqpMgmtController2 {
 	 * 3. 작성자 : sjw7240
 	 * 4. 설명 : 장비 관리 목록 조회 컨트롤러
 	 * </pre>
-	 * @param request
+	 * @param request 
 	 * @param model
 	 * @param reqParams
 	 * @param response
@@ -113,7 +113,8 @@ public class EqpMgmtController2 {
 	 */
     @GetMapping("/erpList")
     @CrossOrigin(origins = "*", methods = RequestMethod.GET)
-    public List eqpList (@RequestParam int offset, @RequestParam int limit) throws Exception{
+    public List eqpList (@RequestParam Map<String, Object> params,  @RequestParam Integer offset,
+            @RequestParam Integer perPageNum) throws Exception{
     	
 //    	reqParams.put("sqlQueryId", "eqpMgmtDAO.eqpMgmtMListTotCnt");
 //    	int totCnt = comService.selectCommonQueryListTotCnt(reqParams);
@@ -121,9 +122,12 @@ public class EqpMgmtController2 {
 //    	
     	
 //		reqParams.put("sqlQueryId", "eqpMgmtDAO.eqpMgmtMList");
-    	System.out.println("Received offset: " + offset + ", limit: " + limit);
-    	int totCnt = eqpMgmtService.getErpTotCnt();
-		List eqpMgmtMList = eqpMgmtService.getEqpList(offset,limit);
+//    	System.out.println("Received offset: " + offset + ", limit: " + limit);
+    	System.out.println("Received params: " + params);
+
+		List eqpMgmtMList = eqpMgmtService.getEqpList(params, offset, perPageNum);
+//		int totCnt = eqpMgmtMList.size(); 
+    	int totCnt = eqpMgmtService.getErpTotCnt(params, offset, perPageNum);
 		eqpMgmtMList.add(totCnt);
 		return eqpMgmtMList;
     	

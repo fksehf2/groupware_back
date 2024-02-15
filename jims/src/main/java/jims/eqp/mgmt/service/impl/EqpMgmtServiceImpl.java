@@ -2,6 +2,7 @@ package jims.eqp.mgmt.service.impl;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Resource;
 
@@ -73,9 +74,10 @@ public class EqpMgmtServiceImpl extends EgovAbstractServiceImpl implements	EqpMg
 
 
 	@Override
-	public List getEqpList(int offset, int limit) throws Exception {
+	public List getEqpList(Map<String, Object> params, Integer offset,
+           Integer perPageNum) throws Exception {
 		
-		return eqpMgmtDAO.getEqpList(offset,limit);
+		return eqpMgmtDAO.getEqpList(params, offset, perPageNum);
 	}
 
 
@@ -87,8 +89,9 @@ public class EqpMgmtServiceImpl extends EgovAbstractServiceImpl implements	EqpMg
 
 
 	@Override
-	public int getErpTotCnt() throws Exception {
-		return eqpMgmtDAO.getErpTotCnt();
+	public int getErpTotCnt(Map<String, Object> params, Integer offset,
+            Integer perPageNum) throws Exception {
+		return eqpMgmtDAO.getErpTotCnt(params, offset, perPageNum);
 	}
 
 

@@ -2,6 +2,7 @@ package jims.eqp.mgmt.service;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import frame.flyt.login.service.FLytLoginVO;
 
@@ -59,11 +60,13 @@ public interface EqpMgmtService {
 	 */
 	void delEqpMgmtUDtl(HashMap<String, String> map)  throws Exception;
 	
-	List getEqpList (int offset, int limit) throws Exception;
+	List getEqpList (Map<String, Object> params, Integer offset,
+             Integer perPageNum) throws Exception;
 
 	List getCode(String cdId) throws Exception;
 	
-	int getErpTotCnt() throws Exception;
+	int getErpTotCnt(Map<String, Object> params, Integer offset,
+            Integer perPageNum) throws Exception;
 	
 	List erpDtl(String eqpSno) throws Exception;
 
