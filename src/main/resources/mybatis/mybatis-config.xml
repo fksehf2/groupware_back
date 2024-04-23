@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+
+<configuration>
+    <settings>
+        <setting name="cacheEnabled" value="false" />
+        <setting name="jdbcTypeForNull" value="NULL" />
+        <!--        <setting name="logImpl" value="LOG4J"/>-->
+    </settings>
+
+    <!-- 자주 사용하는 type의 별칭을 등록해 놓고 Mapper.xml에서 사용할 수 있다. -->
+    <typeAliases>
+<!--        <typeAlias type="com.leisure.gongbang.Cate.dto.CateDto" alias="cateDto"/>-->
+
+    </typeAliases>
+
+<!--     필요한 mapper xml 등록하기 -->
+<!--        <mappers>-->
+<!--            <package name="com.group.groupware"/>-->
+<!--             <mapper resource="mappers/eqpMgmtDao.xml"/>-->
+
+<!--        </mappers>-->
+
+</configuration>
