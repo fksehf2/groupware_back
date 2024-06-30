@@ -12,3 +12,8 @@ mybatis:
   config-location: classpath:mybatis/mybatis-config.xml
   mapper-locations: mybatis/mapper/*.xml
 
+#logging
+logging:
+  level:
+    com:
+      group=INFO:

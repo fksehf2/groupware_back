@@ -245,8 +245,8 @@
         , EQP_NM = #{eqpNm}
         , SR_NO	= #{srNo}
         , EQP_TYP = #{eqpTyp}
-        , PURC_DT = REPLACE(#{purcDt},'-','')
-        , EXPR_DT = REPLACE(#{exprDt},'-','')
+        , PURC_DT = REPLACE(#{purcDt},'/','')
+        , EXPR_DT = REPLACE(#{exprDt},'/','')
         , GUAR_TRM = #{guarTrm}
         , MNFT_CO = #{mnftCo}
         , MDL_NM = #{mdlNm}

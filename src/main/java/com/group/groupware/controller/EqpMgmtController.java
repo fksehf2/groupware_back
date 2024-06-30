@@ -2,9 +2,8 @@ package com.group.groupware.controller;
 
 import com.group.groupware.dto.EqpMgmt;
 import com.group.groupware.service.EqpMgmtService;
-import lombok.extern.slf4j.Slf4j;
-import org.mybatis.logging.Logger;
-import org.mybatis.logging.LoggerFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -95,6 +94,7 @@ public class EqpMgmtController {
 
     }
 
+
     @PostMapping("/regeqp")
     @CrossOrigin(origins = "*", methods = RequestMethod.POST)
     public void regEqp (@RequestBody HashMap<String, Object> params ) throws Exception{
@@ -105,12 +105,12 @@ public class EqpMgmtController {
 
     @GetMapping("/deleqp/{eqpSno}")
     @CrossOrigin(origins = "*", methods = RequestMethod.GET)
-    public void deleqp(@PathVariable String eqpSno) throws Exception {
+    public void delEqp(@PathVariable String eqpSno) throws Exception {
         System.out.println("eqpSno = " + eqpSno);
         eqpMgmtService.delEqpMgmtUDtl(eqpSno);
     }
 
-    @PostMapping("modifyeqp")
+    @PostMapping("/modifyeqp")
     @CrossOrigin(origins = "*", methods = RequestMethod.POST)
     public void modifyEqp(@RequestBody HashMap<String, Object> params) throws Exception{
         System.out.println("params = " + params);
