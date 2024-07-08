@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="qnaDAO">
+
+    <select id="qnaBoardList" parameterType="java.util.HashMap" resultType="Qna">
+        SELECT  PUTUP_SNO
+                ,TITLE
+                ,(SELECT USER_NM FROM USER WHERE USER_ID = A.REGR_ID) AS REGR_NM
+                ,REG_DT
+                ,SELECT_NUM
+        FROM    BOARD A
+        LIMIT #{offset}, #{perPageNum}
+    </select>
+
+    <select id="getQnaTotCnt" parameterType="java.util.HashMap" resultType="int">
+        SELECT COUNT(*)
+        FROM (
+                SELECT  PUTUP_SNO
+                        ,TITLE
+                        ,(SELECT USER_NM FROM USER WHERE USER_ID = A.REGR_ID) AS REGR_NM
+                        ,REG_DT
+                        ,SELECT_NUM
+                FROM    BOARD A
+                LIMIT #{offset}, #{perPageNum}
+            ) q
+    </select>
+</mapper>

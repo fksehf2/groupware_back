@@ -4,7 +4,7 @@
 <mapper namespace="UserDAO">
 
     <select id="isExist" parameterType="User" resultType="User">
-        SELECT USER_ID
+        SELECT USER_ID, USER_NM
         FROM USER
         WHERE PWD = #{PWD}
     </select>
