@@ -40,10 +40,9 @@ public class EqpMgmtController {
      * 3. 작성자 : seran
      * 4. 설명 : 장비 관리 목록 조회 컨트롤러
      * </pre>
-     * @param request
-     * @param model
-     * @param reqParams
-     * @param response
+     * @param params
+     * @param offset
+     * @param perPageNum
      * @return
      * @throws Exception
      */

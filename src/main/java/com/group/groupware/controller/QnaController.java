@@ -36,7 +36,7 @@ public class QnaController {
 
     @GetMapping("/getQnaList")
     @CrossOrigin(origins = "*", methods = RequestMethod.GET)
-    public List<QnaBoard> getQnaList (Map<String, Object> params, @RequestParam Integer offset,
+    public List<QnaBoard> getQnaList (@RequestParam Map<String, Object> params, @RequestParam Integer offset,
                                       @RequestParam Integer perPageNum) throws Exception{
         log.info("start getQna: {}", params);
         List<QnaBoard> qnaList = qnaService.getQnaList(params, offset, perPageNum);
