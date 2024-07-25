@@ -9,20 +9,19 @@
                 <when test="search_select == 0">
                     <!-- 전체 검색 -->
                     AND(
-                    a.TITLE LIKE CONCAT('%', #{search}, '%')
-                    OR a.CNTS LIKE CONCAT('%', #{search}, '%')
---                     OR a.REGR_NM LIKE CONCAT('%', #{search}, '%')
+                    A.TITLE LIKE CONCAT('%', #{search}, '%')
+                    OR A.CNTS LIKE CONCAT('%', #{search}, '%')
                     )
                 </when>
                 <when test="search_select == 1">
                     <!-- 제목 검색 -->
-                    AND a.TITLE LIKE CONCAT('%', #{search}, '%')
+                    AND A.TITLE LIKE CONCAT('%', #{search}, '%')
                 </when>
                 <when test="search_select == 2">
                     <!-- 제목 + 내용 검색 -->
                     AND(
-                    a.TITLE LIKE CONCAT('%', #{search}, '%')
-                    OR a.CNTS LIKE CONCAT('%', #{search}, '%')
+                    A.TITLE LIKE CONCAT('%', #{search}, '%')
+                    OR A.CNTS LIKE CONCAT('%', #{search}, '%')
                     )
                 </when>
             </choose>
@@ -30,7 +29,7 @@
 
     </sql>
 
-    <select id="qnaBoardList" parameterType="java.util.HashMap" resultType="Qna">
+    <select id="qnaBoardList" parameterType="java.util.HashMap" resultType="map">
         SELECT  PUTUP_SNO
                 ,TITLE
                 ,(SELECT USER_NM FROM USER WHERE USER_ID = A.REGR_ID) AS REGR_NM
