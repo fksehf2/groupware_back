@@ -44,4 +44,12 @@ public class QnaController {
 //        qnaList.add()
         return qnaList;
     }
+
+    @GetMapping("/getQnaDetail/{num}")
+    @CrossOrigin(origins = "*", methods = RequestMethod.GET)
+    public List<QnaBoard> getQnaDetail (@PathVariable String num) throws Exception{
+        System.out.println("num     "+ num);
+        List<QnaBoard> qnaDetail = qnaService.getQnaDetail(num);
+        return qnaDetail;
+    }
 }

@@ -25,5 +25,5 @@ public interface QnaService {
     public int getQnaTotCnt(Map<String, Object> params, Integer offset,
                             Integer perPageNum) throws Exception;
 
-
+    public List<QnaBoard> getQnaDetail(String num) throws Exception;
 }

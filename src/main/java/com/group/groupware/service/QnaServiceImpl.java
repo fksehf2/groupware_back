@@ -24,4 +24,9 @@ public class QnaServiceImpl implements QnaService{
     public int getQnaTotCnt(Map<String, Object> params, Integer offset, Integer perPageNum) throws Exception {
         return qnaDAO.getQnaTotCnt(params, offset, perPageNum);
     }
+
+    @Override
+    public List<QnaBoard> getQnaDetail(String num) throws Exception {
+        return qnaDAO.getQnaDetail(num);
+    }
 }

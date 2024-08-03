@@ -53,4 +53,24 @@
                 LIMIT #{offset}, #{perPageNum}
             ) q
     </select>
+
+    <select id="getQnaDetail" parameterType="java.lang.String" resultType="Qna">
+        SELECT
+            A.PUTUP_SNO,
+            A.TITLE,
+            A.CNTS,
+            A.ATCH_FILE_ID,
+            A.SELECT_NUM,
+            A.REG_DT,
+            A.REGR_ID,
+            A.COMFIRM_YN,
+            U.USER_NM AS REGR_NM,
+            U.EMAIL,
+            U.HP_TEL_NO AS TEL
+        FROM
+            BOARD A
+                LEFT JOIN
+            USER U ON A.REGR_ID = U.USER_ID
+        WHERE A.PUTUP_SNO = #{num}
+    </select>
 </mapper>

@@ -27,4 +27,9 @@ public class QnaDAO {
         params.put("perPageNum", perPageNum);
         return session.selectOne("qnaDAO.getQnaTotCnt", params);
     }
+
+    public List<QnaBoard> getQnaDetail(String num){
+        return session.selectList("qnaDAO.getQnaDetail", num);
+
+    }
 }
