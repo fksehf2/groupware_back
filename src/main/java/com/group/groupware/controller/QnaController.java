@@ -1,6 +1,7 @@
 package com.group.groupware.controller;
 
 import com.group.groupware.dto.QnaBoard;
+import com.group.groupware.dto.QnaComent;
 import com.group.groupware.service.QnaService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,5 +52,13 @@ public class QnaController {
         System.out.println("num     "+ num);
         List<QnaBoard> qnaDetail = qnaService.getQnaDetail(num);
         return qnaDetail;
+    }
+
+    @GetMapping("/getComent/{num}")
+    @CrossOrigin(origins = "*", methods = RequestMethod.GET)
+    public List<QnaComent> getComent(@PathVariable String num) throws Exception{
+        log.info("getParameter", num);
+        List<QnaComent> qnaComents = qnaService.getComment(num);
+        return qnaComents;
     }
 }

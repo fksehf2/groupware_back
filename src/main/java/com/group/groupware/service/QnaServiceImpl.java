@@ -1,6 +1,7 @@
 package com.group.groupware.service;
 
 import com.group.groupware.dto.QnaBoard;
+import com.group.groupware.dto.QnaComent;
 import com.group.groupware.repository.EqpMgmtDAO;
 import com.group.groupware.repository.QnaDAO;
 import jakarta.annotation.Resource;
@@ -28,5 +29,10 @@ public class QnaServiceImpl implements QnaService{
     @Override
     public List<QnaBoard> getQnaDetail(String num) throws Exception {
         return qnaDAO.getQnaDetail(num);
+    }
+
+    @Override
+    public List<QnaComent> getComment(String num) throws Exception {
+        return qnaDAO.getComment(num);
     }
 }

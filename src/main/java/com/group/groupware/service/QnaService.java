@@ -1,6 +1,7 @@
 package com.group.groupware.service;
 
 import com.group.groupware.dto.QnaBoard;
+import com.group.groupware.dto.QnaComent;
 
 import java.util.List;
 import java.util.Map;
@@ -26,4 +27,6 @@ public interface QnaService {
                             Integer perPageNum) throws Exception;
 
     public List<QnaBoard> getQnaDetail(String num) throws Exception;
+
+    public List<QnaComent> getComment(String num) throws Exception;
 }

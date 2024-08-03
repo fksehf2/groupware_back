@@ -14,6 +14,7 @@
     <typeAliases>
         <typeAlias type="com.group.groupware.dto.User" alias="User"/>
         <typeAlias type="com.group.groupware.dto.QnaBoard" alias="Qna"/>
+        <typeAlias type="com.group.groupware.dto.QnaComent" alias="QnaComment"/>
 
     </typeAliases>
 

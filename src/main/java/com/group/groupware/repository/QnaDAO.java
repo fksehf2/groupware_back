@@ -1,6 +1,7 @@
 package com.group.groupware.repository;
 
 import com.group.groupware.dto.QnaBoard;
+import com.group.groupware.dto.QnaComent;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +31,9 @@ public class QnaDAO {
 
     public List<QnaBoard> getQnaDetail(String num){
         return session.selectList("qnaDAO.getQnaDetail", num);
+    }
 
+    public List<QnaComent> getComment(String num){
+        return session.selectList("qnaDAO.getComment", num);
     }
 }

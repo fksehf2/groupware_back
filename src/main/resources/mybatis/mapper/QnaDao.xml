@@ -73,4 +73,10 @@
             USER U ON A.REGR_ID = U.USER_ID
         WHERE A.PUTUP_SNO = #{num}
     </select>
+
+    <select id="getComment" parameterType="java.lang.String" resultType="QnaComment">
+        SELECT *
+        FROM BOARD_COMT
+        WHERE PUTUP_SNO = #{num}
+    </select>
 </mapper>
