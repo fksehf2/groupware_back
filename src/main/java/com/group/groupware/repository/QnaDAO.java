@@ -36,4 +36,8 @@ public class QnaDAO {
     public List<QnaComent> getComment(String num){
         return session.selectList("qnaDAO.getComment", num);
     }
+
+    public void delComt(String comt){
+       session.update("qnaDAO.delComt", comt);
+    }
 }

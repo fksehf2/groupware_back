@@ -35,4 +35,9 @@ public class QnaServiceImpl implements QnaService{
     public List<QnaComent> getComment(String num) throws Exception {
         return qnaDAO.getComment(num);
     }
+
+    @Override
+    public void delComt(String comt) throws Exception {
+        qnaDAO.delComt(comt);
+    }
 }

@@ -20,13 +20,15 @@ public interface QnaService {
      * @throws Exception
      */
 
-    public List<QnaBoard> getQnaList (Map<String, Object> params, Integer offset,
+    List<QnaBoard> getQnaList (Map<String, Object> params, Integer offset,
                                       Integer perPageNum) throws Exception;
 
-    public int getQnaTotCnt(Map<String, Object> params, Integer offset,
+    int getQnaTotCnt(Map<String, Object> params, Integer offset,
                             Integer perPageNum) throws Exception;
 
-    public List<QnaBoard> getQnaDetail(String num) throws Exception;
+    List<QnaBoard> getQnaDetail(String num) throws Exception;
 
-    public List<QnaComent> getComment(String num) throws Exception;
+    List<QnaComent> getComment(String num) throws Exception;
+
+    void delComt(String comt) throws Exception;
 }

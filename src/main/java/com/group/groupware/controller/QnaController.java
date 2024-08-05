@@ -61,4 +61,12 @@ public class QnaController {
         List<QnaComent> qnaComents = qnaService.getComment(num);
         return qnaComents;
     }
+
+    @GetMapping("/delComt/{comt}")
+    @CrossOrigin(origins = "*", methods = RequestMethod.GET)
+    public void delComt(@PathVariable String comt) throws Exception{
+        System.out.println("QnaController.delComt   " + comt);
+        qnaService.delComt(comt);
+
+    }
 }

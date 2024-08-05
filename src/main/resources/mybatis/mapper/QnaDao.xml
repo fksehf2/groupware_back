@@ -79,4 +79,10 @@
         FROM BOARD_COMT
         WHERE PUTUP_SNO = #{num}
     </select>
+
+    <update id="delComt" parameterType="java.lang.String" >
+        UPDATE BOARD_COMT
+        SET USE_YN ="N"
+        WHERE COMT = #{COMT}
+    </update>
 </mapper>
