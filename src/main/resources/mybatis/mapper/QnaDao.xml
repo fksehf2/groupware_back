@@ -85,4 +85,24 @@
         SET USE_YN ="N"
         WHERE COMT = #{COMT}
     </update>
+
+    <insert id="regComnt" parameterType="QnaComment">
+        INSERT
+        BOARD_COMT (
+             PUTUP_SNO
+            ,USER_ID
+            ,COMT_CNTS
+            ,USE_YN
+            ,REG_DT
+            ,REGR_ID
+            )
+            VALUES(
+            #{PUTUP_SNO}
+            ,#{USER_ID}
+            ,#{COMT_CNTS}
+            ,'Y'
+            ,#{REG_DT}
+            ,#{REGR_ID}
+            )
+    </insert>
 </mapper>

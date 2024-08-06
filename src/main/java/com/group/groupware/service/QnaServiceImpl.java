@@ -40,4 +40,9 @@ public class QnaServiceImpl implements QnaService{
     public void delComt(String comt) throws Exception {
         qnaDAO.delComt(comt);
     }
+
+    @Override
+    public void regComnt(QnaComent qnaComent) throws Exception {
+        qnaDAO.regComnt(qnaComent);
+    }
 }

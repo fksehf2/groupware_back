@@ -67,6 +67,13 @@ public class QnaController {
     public void delComt(@PathVariable String comt) throws Exception{
         System.out.println("QnaController.delComt   " + comt);
         qnaService.delComt(comt);
+    }
+
+    @PostMapping("/regComnt")
+    @CrossOrigin(origins = "*", methods = RequestMethod.POST)
+    public void regComnt(@RequestBody QnaComent qnaComent) throws Exception{
+        log.info("getParameter", qnaComent);
+        qnaService.regComnt(qnaComent);
 
     }
 }

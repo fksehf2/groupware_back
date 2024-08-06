@@ -25,5 +25,8 @@ public class QnaComent {
     private Date UPD_DT;
     private String UPDR_ID;
 
-
+    @Override
+    public String toString() {
+        return super.toString();
+    }
 }

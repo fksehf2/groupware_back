@@ -40,4 +40,8 @@ public class QnaDAO {
     public void delComt(String comt){
        session.update("qnaDAO.delComt", comt);
     }
+
+    public void regComnt(QnaComent qnaComent){
+        session.insert("qnaDAO.regComnt", qnaComent);
+    }
 }

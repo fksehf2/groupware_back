@@ -31,4 +31,6 @@ public interface QnaService {
     List<QnaComent> getComment(String num) throws Exception;
 
     void delComt(String comt) throws Exception;
+
+    void regComnt(QnaComent qnaComent) throws Exception;
 }
