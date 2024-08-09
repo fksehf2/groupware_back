@@ -1,4 +1,4 @@
-## My Portfolio Site with Spring
+## My Portfolio Site with Spring
 
 🌟 주요 기능
 
