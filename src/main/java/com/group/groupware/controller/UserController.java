@@ -45,6 +45,18 @@ public class UserController {
         }
     }
 
+    /**
+     *
+     * <pre>
+     * 1. 메소드명 : Login
+     * 2. 작성일 : 2024. 07. 30.
+     * 3. 작성자 : seran
+     * 4. 설명 : 로그인 컨트롤러
+     * </pre>
+     * @param params
+     * @return ResponseEntity
+     * @throws Exception
+     */
     @PostMapping("/login-jwt")
     @CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true", methods = RequestMethod.POST)
     public ResponseEntity<User> Login(@RequestBody User params) throws Exception {
@@ -69,6 +81,18 @@ public class UserController {
         }
         return ResponseEntity.ok(resultVO);
     }
+    /**
+     *
+     * <pre>
+     * 1. 메소드명 : Login
+     * 2. 작성일 : 2024. 07. 30.
+     * 3. 작성자 : seran
+     * 4. 설명 : 로그아웃 컨트롤러
+     * </pre>
+     * @param
+     * @return ResponseEntity
+     * @throws Exception
+     */
     @GetMapping ("/logout")
     @CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true", methods = RequestMethod.GET)
     public ResponseEntity<Map<String, String>> LogOut (){

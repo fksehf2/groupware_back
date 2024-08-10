@@ -35,8 +35,8 @@ public class EqpMgmtController {
     /**
      *
      * <pre>
-     * 1. 메소드명 : queryEqpMgmtMList
-     * 2. 작성일 : 2024. 02. 29.
+     * 1. 메소드명 : eqpList
+     * 2. 작성일 : 2024. 04. 23.
      * 3. 작성자 : seran
      * 4. 설명 : 장비 관리 목록 조회 컨트롤러
      * </pre>
@@ -62,6 +62,18 @@ public class EqpMgmtController {
 
     }
 
+    /**
+     *
+     * <pre>
+     * 1. 메소드명 : erpCode
+     * 2. 작성일 : 2024. 04. 23.
+     * 3. 작성자 : seran
+     * 4. 설명 : 장비 관리 코드 조회 컨트롤러
+     * </pre>
+     * @param cdId
+     * @return
+     * @throws Exception
+     */
     @GetMapping("/erpCode/{cdId}")
     @CrossOrigin(origins = "*", methods = RequestMethod.GET)
     public List erpCode(@PathVariable String cdId) throws Exception {
@@ -70,6 +82,18 @@ public class EqpMgmtController {
         return erpCode;
     }
 
+    /**
+     *
+     * <pre>
+     * 1. 메소드명 : erpDtl
+     * 2. 작성일 : 2024. 04. 23.
+     * 3. 작성자 : seran
+     * 4. 설명 : 장비 관리 상세 조회 컨트롤러
+     * </pre>
+     * @param eqpSno
+     * @return
+     * @throws Exception
+     */
     @GetMapping("/erpDtl")
     @CrossOrigin(origins = "*", methods = RequestMethod.GET)
     public List erpDtl(@RequestParam String eqpSno) throws Exception{
@@ -77,6 +101,21 @@ public class EqpMgmtController {
         List erpDtl = eqpMgmtService.erpDtl(eqpSno);
         return erpDtl;
     }
+
+    /**
+     *
+     * <pre>
+     * 1. 메소드명 : popupList
+     * 2. 작성일 : 2024. 04. 23.
+     * 3. 작성자 : seran
+     * 4. 설명 : 장비 관리 팝업 조회 컨트롤러
+     * </pre>
+     * @param params
+     * @param offset
+     * @param perPageNum
+     * @return
+     * @throws Exception
+     */
     @GetMapping("/popupList")
     @CrossOrigin(origins = "*", methods = RequestMethod.GET)
     public List popupList (@RequestParam Map<String, Object> params, @RequestParam Integer offset,
@@ -93,7 +132,18 @@ public class EqpMgmtController {
 
     }
 
-
+    /**
+     *
+     * <pre>
+     * 1. 메소드명 : regEqp
+     * 2. 작성일 : 2024. 04. 23.
+     * 3. 작성자 : seran
+     * 4. 설명 : 장비 관리 등록 컨트롤러
+     * </pre>
+     * @param params
+     * @return
+     * @throws Exception
+     */
     @PostMapping("/regeqp")
     @CrossOrigin(origins = "*", methods = RequestMethod.POST)
     public void regEqp (@RequestBody HashMap<String, Object> params ) throws Exception{
@@ -102,6 +152,18 @@ public class EqpMgmtController {
 
     }
 
+    /**
+     *
+     * <pre>
+     * 1. 메소드명 : deleqp
+     * 2. 작성일 : 2024. 04. 23.
+     * 3. 작성자 : seran
+     * 4. 설명 : 장비 관리 삭제 컨트롤러
+     * </pre>
+     * @param eqpSno
+     * @return
+     * @throws Exception
+     */
     @GetMapping("/deleqp/{eqpSno}")
     @CrossOrigin(origins = "*", methods = RequestMethod.GET)
     public void delEqp(@PathVariable String eqpSno) throws Exception {
@@ -109,6 +171,18 @@ public class EqpMgmtController {
         eqpMgmtService.delEqpMgmtUDtl(eqpSno);
     }
 
+    /**
+     *
+     * <pre>
+     * 1. 메소드명 : modifyEqp
+     * 2. 작성일 : 2024. 04. 23.
+     * 3. 작성자 : seran
+     * 4. 설명 : 장비 관리 수정 컨트롤러
+     * </pre>
+     * @param params
+     * @return
+     * @throws Exception
+     */
     @PostMapping("/modifyeqp")
     @CrossOrigin(origins = "*", methods = RequestMethod.POST)
     public void modifyEqp(@RequestBody HashMap<String, Object> params) throws Exception{

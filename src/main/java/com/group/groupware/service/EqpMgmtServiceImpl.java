@@ -16,10 +16,7 @@ public class EqpMgmtServiceImpl implements EqpMgmtService{
     /**
      *
      * <pre>
-     * 1. 클래스명 : regEqpMgmtRDtl.java
-     * 2. 작성일 : 2021. 7. 19.
-     * 3. 작성자 : sjw7240
-     * 4. 설명 : 장비 관리 등록 impl
+     * 장비 관리 등록 impl
      * </pre>
      */
     public void regEqpMgmtRDtl(HashMap<String, Object> map) throws Exception{
@@ -29,13 +26,7 @@ public class EqpMgmtServiceImpl implements EqpMgmtService{
 
 
     /**
-     *
-     * <pre>
-     * 1. 클래스명 : updEqpMgmtUDtl.java
-     * 2. 작성일 : 2021. 7. 19.
-     * 3. 작성자 : sjw7240
-     * 4. 설명 : 장비 관리 수정 impl
-     * </pre>
+     * 장비 관리 수정 impl
      */
     public void updEqpMgmtUDtl(HashMap<String, Object> params) throws Exception {
         eqpMgmtDao.updEqpMgmtUDtl(params);
@@ -43,20 +34,16 @@ public class EqpMgmtServiceImpl implements EqpMgmtService{
     }
 
     /**
-     *
-     * <pre>
-     * 1. 클래스명 : delEqpMgmtUDtl.java
-     * 2. 작성일 : 2021. 7. 19.
-     * 3. 작성자 : sjw7240
-     * 4. 설명 : 장비 관리 삭제 impl
-     * </pre>
+     * 장비 관리 삭제 impl
      */
     public void delEqpMgmtUDtl(String eqpSno) throws Exception {
         eqpMgmtDao.delEqpMgmtUDtl(eqpSno);
 
     }
 
-
+    /**
+     * 장비 관리 조회 impl
+     */
     @Override
     public List getEqpList(Map<String, Object> params, Integer offset,
                            Integer perPageNum) throws Exception {
@@ -65,6 +52,9 @@ public class EqpMgmtServiceImpl implements EqpMgmtService{
     }
 
 
+    /**
+     * 장비 관리 코드 조회 impl
+     */
     @Override
     public List getCode(String cdId) throws Exception {
 
@@ -72,6 +62,9 @@ public class EqpMgmtServiceImpl implements EqpMgmtService{
     }
 
 
+    /**
+     * 장비 관리 카운트 조회 impl
+     */
     @Override
     public int getErpTotCnt(Map<String, Object> params, Integer offset,
                             Integer perPageNum) throws Exception {
@@ -79,6 +72,9 @@ public class EqpMgmtServiceImpl implements EqpMgmtService{
     }
 
 
+    /**
+     * 장비 관리 상세 조회 impl
+     */
     @Override
     public List erpDtl(String eqpSno) throws Exception {
         return eqpMgmtDao.erpDtl(eqpSno);
@@ -90,6 +86,10 @@ public class EqpMgmtServiceImpl implements EqpMgmtService{
         return 0;
     }
 
+
+    /**
+     * 장비 관리 팝업 조회 impl
+     */
     @Override
     public List popList(Map<String, Object> params, Integer offset,
                         Integer perPageNum) throws Exception {
