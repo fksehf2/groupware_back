@@ -11,6 +11,7 @@ import lombok.ToString;
 @NoArgsConstructor
 @ToString
 public class User {
+
     @JsonProperty("USER_ID")
     private String USER_ID;
     @JsonProperty("PWD")
@@ -21,4 +22,6 @@ public class User {
     private String TOKEN;
     @JsonProperty("USER_NM")
     private String USER_NM;
+    @JsonProperty("RESULTMESSEAGE")
+    private String ResultMessage;
 }

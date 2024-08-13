@@ -59,17 +59,24 @@ public class UserController {
      */
     @PostMapping("/login-jwt")
     @CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true", methods = RequestMethod.POST)
-    public ResponseEntity<User> Login(@RequestBody User params) throws Exception {
-        log.info("Received parameter: {}", params.getUSER_ID());
-        log.info("Received parameter: {}", params.getPWD());
+    public ResponseEntity<User> Login(@RequestBody(required = false) User params) throws Exception {
+//        log.info("Received parameter: {}", params.getUSER_ID());
+//        log.info("Received parameter: {}", params.getPWD());
 
         User resultVO = new User();
 
+        if(params == null) {
+            resultVO.setREG_STATUS("400");
+            resultVO.setResultMessage("인증오류입니다.");
+            return ResponseEntity.badRequest().body(resultVO);
+        }
         String token = null;
         List<User> userChk = userDAO.LoginChk(params);
         System.out.println("loginCHk: {}" + userChk.toString());
-        if (userChk == null)
-            new UnauthorizedException();
+        if (userChk == null || userChk.isEmpty()) {
+            System.out.println("loginChk: No users found.");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
         else {
             User user = userChk.get(0);
             token = jwtService.createToken(user.getUSER_ID() + "", (60 * 1000 * 60));
