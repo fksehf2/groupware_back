@@ -75,7 +75,7 @@ public class UserController {
         System.out.println("loginCHk: {}" + userChk.toString());
         if (userChk == null || userChk.isEmpty()) {
             System.out.println("loginChk: No users found.");
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            return ResponseEntity.badRequest().body(resultVO);
         }
         else {
             User user = userChk.get(0);
