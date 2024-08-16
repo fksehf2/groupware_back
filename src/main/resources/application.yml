@@ -17,3 +17,15 @@ logging:
   level:
     com:
       group=INFO:
+
+# JAP
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+
+# FILE
+  servlet:
+    multipart:
+      max-file-size: 20MB
+      max-request-size: 20MB
