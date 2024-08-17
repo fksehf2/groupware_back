@@ -29,3 +29,4 @@ logging:
     multipart:
       max-file-size: 20MB
       max-request-size: 20MB
+      max-http-form-post-size: 10MB
