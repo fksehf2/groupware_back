@@ -1,5 +1,6 @@
 package com.group.groupware.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -33,6 +34,5 @@ public class FileEntity {
 
     @Column(name = "Description")
     private String Description;
-
 
 }
