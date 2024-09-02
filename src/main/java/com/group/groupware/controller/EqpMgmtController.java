@@ -1,6 +1,5 @@
 package com.group.groupware.controller;
 
-import com.group.groupware.dto.EqpMgmt;
 import com.group.groupware.service.EqpMgmtService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9,7 +8,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Supplier;
 
 /**
  *
