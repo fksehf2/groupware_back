@@ -144,7 +144,7 @@ public class EqpMgmtController {
      * @return
      * @throws Exception
      */
-    @PostMapping("/regeqp")
+    @PostMapping("/eqp")
     @CrossOrigin(origins = "*", methods = RequestMethod.POST)
     public void regEqp (@RequestBody HashMap<String, Object> params ) throws Exception{
         System.out.println("params = " + params);

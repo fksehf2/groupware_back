@@ -55,7 +55,7 @@ public class FileServiceImpl  implements FileService{
             img.setATCH_FILE_ID("img_" + fileType + "_" + cutId);
 
             // 파일 엔티티를 데이터베이스에 저장
-            fileRepository.save(img);
+            fileRepository.flush(img);
 
         } catch (Exception e) {
             e.printStackTrace();

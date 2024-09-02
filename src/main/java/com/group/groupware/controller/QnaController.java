@@ -35,7 +35,7 @@ public class QnaController {
      * @throws Exception
      */
 
-    @GetMapping("/getQnaList")
+    @GetMapping("/qnaList")
     @CrossOrigin(origins = "*", methods = RequestMethod.GET)
     public List<QnaBoard> getQnaList (@RequestParam Map<String, Object> params, @RequestParam Integer offset,
                                       @RequestParam Integer perPageNum) throws Exception{
@@ -58,7 +58,7 @@ public class QnaController {
      * @return QnaBoard
      * @throws Exception
      */
-    @GetMapping("/getQnaDetail/{num}")
+    @GetMapping("/qnaDetail/{num}")
     @CrossOrigin(origins = "*", methods = RequestMethod.GET)
     public List<QnaBoard> getQnaDetail (@PathVariable String num) throws Exception{
         System.out.println("num     "+ num);
@@ -78,7 +78,7 @@ public class QnaController {
      * @return QnaComent
      * @throws Exception
      */
-    @GetMapping("/getComent/{num}")
+    @GetMapping("/coment/{num}")
     @CrossOrigin(origins = "*", methods = RequestMethod.GET)
     public List<QnaComent> getComent(@PathVariable String num) throws Exception{
         log.info("getParameter", num);
@@ -117,7 +117,7 @@ public class QnaController {
      * @return QnaComent
      * @throws Exception
      */
-    @PostMapping("/regComnt")
+    @PostMapping("/comnt")
     @CrossOrigin(origins = "*", methods = RequestMethod.POST)
     public void regComnt(@RequestBody QnaComent qnaComent) throws Exception{
         log.info("getParameter", qnaComent);
